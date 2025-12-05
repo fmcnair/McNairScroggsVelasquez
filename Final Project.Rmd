@@ -4,28 +4,286 @@ subtitle: "ENVIRON 872"
 author: "Flannery McNair, Andi Scroggs, and Alonso Valasquez"
 date: "2025-12-05"
 output: html_document
+toc: TRUE
+lof: TRUE
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+
+library(here)
+library(lubridate)
+library(tidyverse)
+library(readr)
+library(dplyr)
+
+here()
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+## Rationale and Research Question
 
-```{r cars}
-summary(cars)
+
+\newpage
+
+## Dataset Information
+
+
+\newpage
+
+## Exploration of Raw Data
+
+Exploration of the raw data consisted of understanding the number of files and contents of those files for each Station. Originally, the water quality data and the nutrient data were separate for each station we are studying. We uploaded all of the files with nutrient and water quality data from the four stations we are studying for the years 2002-2024. We obtained a separate file with information about the stations in which the data was collected. 
+
+```{r import of raw data, message=FALSE, warning=FALSE, include=FALSE}
+sampling_stations <- read_csv("sampling_stations.csv")
+
+# Importing the data within each folder as one and then combining data from each folder into their own datasets since they have the same columns
+
+# Nutrients
+nocecnut <- list.files(path = "./Data/nocecnut", pattern = "\\.csv$", full.names = TRUE)
+nocec_nutrients <- nocecnut %>%
+  plyr::ldply(read.csv)
+
+noclcnut <- list.files(path = "./Data/noclcnut", pattern = "\\.csv$", full.names = TRUE)
+noclc_nutrients <- noclcnut %>%
+  plyr::ldply(read.csv)
+
+nocrcnut <- list.files(path = "./Data/nocrcnut", pattern = "\\.csv$", full.names = TRUE)
+nocrc_nutrients <- nocrcnut %>%
+  plyr::ldply(read.csv)
+
+noczbnut <- list.files(path = "./Data/noczbnut", pattern = "\\.csv$", full.names = TRUE)
+noczb_nutrients <- noczbnut %>%
+  plyr::ldply(read.csv)
+
+# Water Quality 
+nocecwq <- list.files(path = "./Data/nocecwq", pattern = "\\.csv$", full.names = TRUE)
+nocec_water_quality <- nocecwq %>%
+  plyr::ldply(read.csv)
+
+noclcwq <- list.files(path = "./Data/noclcwq", pattern = "\\.csv$", full.names = TRUE)
+noclc_water_quality <- noclcwq %>%
+  plyr::ldply(read.csv)
+
+nocrcwq <- list.files(path = "./Data/nocrcwq", pattern = "\\.csv$", full.names = TRUE)
+nocrc_water_quality <- nocrcwq %>%
+  plyr::ldply(read.csv)
+
+noczbwq <- list.files(path = "./Data/noczbwq", pattern = "\\.csv$", full.names = TRUE)
+noczb_water_quality <- noczbwq %>%
+  plyr::ldply(read.csv)
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+\newpage
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+## Data Wrangling
+
+After the conclusion of exploring the raw data, we began to wrangle the data by choosing the variables we wished to keep for our study. For the nutrient data sets we kept:
+* Station Code
+* Date and Time
+* Orthophosphate (PO4F) (mg/L) 
+* Ammonnium Fluoride (NH4F) (mg/L) 
+* Nitryl Fluoride (NO2F) (mg/L) 
+* Fluorine Nitrate (NO3F) (mg/L) 
+* Nitrate + Nitrate (NO23F) (mg/L)
+* Chlorophyll (ug/L)
+For the water quality data sets we kept the variables:  
+* Station Code
+* Date and Time
+* Temperature (degrees Celsius)
+* Salinity (ppt)
+* Dissolved Oxygen (%)
+* Dissolved Oxygen in milligrams per Liter (mg/L)
+* Depth (m)
+* pH (standard units)
+* Turbidity (NTU)
+
+ 
+```{r first cleaning/choosing the columns, message=FALSE, warning=FALSE, include=FALSE}
+# Nutrients
+nocec_nutrients_cleaned <- nocec_nutrients %>%
+  select(StationCode, DateTimeStamp, PO4F, NH4F, 
+         NO2F, NO3F, NO23F, CHLA_N)
+
+noclc_nutrients_cleaned <- noclc_nutrients %>%
+  select(StationCode, DateTimeStamp, PO4F, NH4F, 
+         NO2F, NO3F, NO23F, CHLA_N)
+
+nocrc_nutrients_cleaned <- nocrc_nutrients %>%
+  select(StationCode, DateTimeStamp, PO4F,NH4F, 
+         NO2F, NO3F, NO23F, CHLA_N)
+
+noczb_nutrients_cleaned <- noczb_nutrients %>%
+  select(StationCode, DateTimeStamp, PO4F, NH4F, 
+         NO2F, NO3F, NO23F, CHLA_N)
+
+# Water Quality 
+nocec_water_quality_cleaned <- nocec_water_quality %>%
+  select(StationCode, DateTimeStamp, Temp, Sal, DO_Pct, 
+         DO_mgl, Depth, pH, Turb)
+
+noclc_water_quality_cleaned <- noclc_water_quality %>%
+  select(StationCode, DateTimeStamp, Temp, Sal,  DO_Pct, 
+         DO_mgl, Depth, pH, Turb)
+
+nocrc_water_quality_cleaned <- nocrc_water_quality %>%
+  select(StationCode, DateTimeStamp, Temp, Sal,  DO_Pct, 
+         DO_mgl, Depth, pH, Turb)
+
+noczb_water_quality_cleaned <- noczb_water_quality %>% 
+  select(StationCode, DateTimeStamp, Temp, Sal,  DO_Pct, 
+         DO_mgl, Depth, pH, Turb)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r combining the datasets, echo=FALSE, message=FALSE, warning=FALSE}
+# Nutrients
+nutrients <- bind_rows(nocec_nutrients_cleaned,
+                       noclc_nutrients_cleaned,
+                       nocrc_nutrients_cleaned,
+                       noczb_nutrients_cleaned)
+str(nutrients)
+
+# Water Quality
+water_quality <- bind_rows(nocec_water_quality_cleaned,
+                           noclc_water_quality_cleaned,
+                           nocrc_water_quality_cleaned,
+                           noczb_water_quality_cleaned)
+str(water_quality)
+```
+
+```{r creating a Date column, message=FALSE, warning=FALSE, include=FALSE}
+# Nutrients
+nutrients <- nutrients %>%
+  mutate(DateTimeStamp = mdy_hm(DateTimeStamp))
+  
+nutrients <- nutrients %>% 
+  mutate(Date = as.Date(DateTimeStamp))
+
+# Water Quality
+water_quality <- water_quality %>%
+  mutate(DateTimeStamp = mdy_hm(DateTimeStamp))
+
+water_quality <- water_quality %>%
+  mutate(Date = as.Date(DateTimeStamp))
+```
+
+```{r clean Sampling Station dataset, echo=FALSE, message=FALSE, warning=FALSE}
+# Sampling Stations
+# rename the  columns bc they have spaces
+sampling_stations <- sampling_stations %>%
+  rename(NERR_SiteID = `NERR Site ID`,
+    StationCode = `Station Code`,
+    StationName = `Station Name`,
+    LatLong = `Lat Long`,
+    Reserve_Name = `Reserve Name`)
+
+#Choosing the columns we want
+sampling_stations_cleaned <- sampling_stations %>%
+  select(NERR_SiteID, StationCode, StationName, LatLong, 
+         Latitude, Longitude, Status, State, Reserve_Name)
+
+sampling_stations_cleaned <- sampling_stations_cleaned %>%
+  filter(StationCode %in% c("nocecnut", "nocecwq", "noclcnut", "noclcwq", 
+                            "nocrcnut", "nocrcwq", "noczbnut", "noczbwq"))
+str(sampling_stations_cleaned)
+```
+
+```{r clean up formatting of StationCodes}
+# Clean up spaces and formatting differences
+nutrients$StationCode <- trimws(nutrients$StationCode)
+water_quality$StationCode <- trimws(water_quality$StationCode)
+sampling_stations_cleaned$StationCode <- trimws(sampling_stations_cleaned$StationCode)
+
+str(nutrients$StationCode)
+str(water_quality$StationCode)
+str(sampling_stations_cleaned$StationCode)
+```
+
+```{r Averaging the data per day, message=FALSE, warning=FALSE, include=FALSE}
+# Nutrient - daily avg of all variables
+nutrients_dailyavg <- nutrients %>%
+  group_by(Date, StationCode) %>%
+  summarise(PO4F = mean(PO4F, na.rm = TRUE),
+            NH4F = mean(NH4F, na.rm = TRUE),
+            NO2F = mean(NO2F, na.rm = TRUE),
+            NO3F = mean(NO3F, na.rm = TRUE),
+            NO23F = mean(NO23F, na.rm = TRUE),
+            CHLA_N = mean(CHLA_N, na.rm = TRUE))
+
+# Nutrient - monthly avg of all variables 
+nutrients_monthlyavg <- nutrients %>%
+  mutate(Year = year(Date),
+         Month = month(Date)) %>%
+  group_by(Year, Month, StationCode) %>%
+  summarise(PO4F = mean(PO4F, na.rm = TRUE),
+            NH4F = mean(NH4F, na.rm = TRUE),
+            NO2F = mean(NO2F, na.rm = TRUE),
+            NO3F = mean(NO3F, na.rm = TRUE),
+            NO23F = mean(NO23F, na.rm = TRUE),
+            CHLA_N = mean(CHLA_N, na.rm = TRUE))
+  
+# Water Quality - avg per day of all variables
+water_quality_dailyavg <- water_quality %>%
+  group_by(Date, StationCode) %>%
+  summarise(Temp = mean(Temp, na.rm = TRUE),
+            Sal = mean(Sal, na.rm = TRUE),
+            DO_Pct = mean(DO_Pct, na.rm = TRUE),
+            DO_mgl = mean(DO_mgl, na.rm = TRUE),
+            Depth = mean(Depth, na.rm = TRUE),
+            pH = mean(pH, na.rm = TRUE),
+            Turb = mean(Turb, na.rm = TRUE))
+
+# Water Quality - monthly avg of all variables 
+water_quality_monthlyavg <- water_quality %>%
+  mutate(Year = year(Date),
+         Month = month(Date)) %>%
+  group_by(Year, Month, StationCode) %>%
+  summarise(Temp = mean(Temp, na.rm = TRUE),
+            Sal = mean(Sal, na.rm = TRUE),
+            DO_Pct = mean(DO_Pct, na.rm = TRUE),
+            DO_mgl = mean(DO_mgl, na.rm = TRUE),
+            Depth = mean(Depth, na.rm = TRUE),
+            pH = mean(pH, na.rm = TRUE),
+            Turb = mean(Turb, na.rm = TRUE))
+```
+
+After cleaning, preparing, and combining all of the files into one data set for nutrients and one data set for water quality, we added the sampling station data to each. This allowed us to create two large data sets which we will use for our study.
+
+```{r add station names to nutrient and water quality data, message=FALSE, warning=FALSE, include=FALSE}
+#joining station names to nutrients
+nutrients_stations_dailyavg <- 
+  left_join(nutrients_dailyavg, sampling_stations_cleaned, by = "StationCode")
+
+nutrients_stations_monthlyavg <- 
+  left_join(nutrients_dailyavg, sampling_stations_cleaned, by = "StationCode")
+
+#joining station names to water_quality
+water_quality_stations <- 
+  left_join(water_quality_dailyavg, sampling_stations_cleaned, by = "StationCode")
+
+water_quality_stations <- 
+  left_join(water_quality_monthlyavg, sampling_stations_cleaned, by = "StationCode")
+```
+
+\newpage
+
+## Exploration of Processed Data
+
+```{r}
+
+```
+
+
+\newpage
+
+## Analysis
+
+
+## Summary and Conclusion
+
+
+\newpage
+
+## References
