@@ -267,6 +267,19 @@ water_quality_stations <-
   left_join(water_quality_monthlyavg, sampling_stations_cleaned, by = "StationCode")
 ```
 
+```{r}
+#creating a proper date column for time series analysis
+water_quality_stations <- water_quality_stations %>% 
+  mutate(Date = ym(paste(Year, Month)))
+```
+
+Now we want to save this final cleaned data set and make sure it's pushed to our repository in Github!
+```{r}
+write.csv(water_quality_stations, row.names = FALSE, file =
+            "./Data/water_quality_stations_cleaned")
+```
+
+
 \newpage
 
 ## Exploration of Processed Data
