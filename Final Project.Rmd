@@ -258,7 +258,7 @@ nutrients_stations_dailyavg <-
   left_join(nutrients_dailyavg, sampling_stations_cleaned, by = "StationCode")
 
 nutrients_stations_monthlyavg <- 
-  left_join(nutrients_dailyavg, sampling_stations_cleaned, by = "StationCode")
+  left_join(nutrients_monthlyavg, sampling_stations_cleaned, by = "StationCode")
 
 #joining station names to water_quality
 water_quality_stations <- 
@@ -272,12 +272,52 @@ water_quality_stations <-
 #creating a proper date column for time series analysis
 water_quality_stations <- water_quality_stations %>% 
   mutate(Date = ym(paste(Year, Month)))
+nutrients_stations_monthlyavg <- nutrients_stations_monthlyavg %>% 
+  mutate(Date = ym(paste(Year,Month)))
 ```
+
+```{r}
+#merging the two datasets to make one monstrous master dataset
+merged_test <- full_join(water_quality_stations, nutrients_stations_monthlyavg,
+                    by = c("StationName", "Date"),
+                    suffix = c(".wq", ".nutr"))
+
+#removing duplicated columns
+stations_wq_nutr_cleaned <- merged_test %>%
+  mutate(
+    StationCode = coalesce(StationCode.wq, StationCode.nutr),
+    Latitude = coalesce(Latitude.wq, Latitude.nutr),
+    Longitude = coalesce(Longitude.wq, Longitude.nutr),
+    LatLong = coalesce(LatLong.wq, LatLong.nutr),
+    Year = coalesce(Year.wq, Year.nutr),
+    Month = coalesce(Month.wq, Month.nutr),
+    NERR_SiteID = coalesce(NERR_SiteID.wq, NERR_SiteID.nutr),
+    Status = coalesce(Status.wq, Status.nutr),
+    State = coalesce(State.wq, State.nutr),
+    Reserve_Name = coalesce(Reserve_Name.wq, Reserve_Name.nutr),
+  ) %>%
+  select(-StationCode.wq, -StationCode.nutr,
+         -Latitude.wq, -Latitude.nutr,
+         -Longitude.wq, -Longitude.nutr,
+         -Year.wq, -Year.nutr,
+         -Month.wq, -Month.nutr,
+         -NERR_SiteID.wq, -NERR_SiteID.nutr,
+         -Status.wq, -Status.nutr,
+         -State.wq, -State.nutr,
+         -Reserve_Name.wq, -Reserve_Name.nutr,
+         -LatLong.wq, -LatLong.nutr) %>% 
+  arrange(StationName, Date)
+```
+
 
 Now we want to save this final cleaned data set and make sure it's pushed to our repository in Github!
 ```{r}
 write.csv(water_quality_stations, row.names = FALSE, file =
-            "./Data/water_quality_stations_cleaned")
+            "./Data/water_quality_stations_monthlyavg_cleaned")
+write.csv(nutrients_stations_monthlyavg, row.names = FALSE, file =
+            "./Data/nutrients_stations_monthlyavg_cleaned")
+write.csv(stations_wq_nutr_cleaned, row.names = FALSE, file =
+            "./Data/stations_wq_nutr_cleaned")
 ```
 
 
@@ -286,6 +326,7 @@ write.csv(water_quality_stations, row.names = FALSE, file =
 ## Exploration of Processed Data
 
 ```{r}
+#Setting our theme, a lovely light toothpaste seafoam green to match a eutrophication aesthetic?
 our_theme <- theme_classic(base_size = 14, base_family = "serif") +
   theme(plot.title = element_text(color = '#4F4F4F'),
         axis.ticks = element_line(color = '#4F4F4F'),
@@ -310,7 +351,8 @@ water_quality_stations %>%
   ggplot(aes(x = Date, y = DO_mgl, color = StationName)) +
   geom_line() +
   xlab("Date") +
-  ylab("DO (mgl)") +
+  ylab("Dissolved Oxygen (mgl)") +
+  labs(color = "Station Name") +
   our_theme
 ```
 
@@ -321,23 +363,35 @@ water_quality_stations %>%
   ggplot(mapping = aes(x=Date, y=DO_mgl)) +
   geom_line() +
   xlab("Date") +
-  ylab("DO (mgl)") +
+  ylab("Dissolved Oxygen (mgl)") +
   theme(axis.text.x = (element_text(size=7))) +
   facet_wrap(vars(StationName), nrow = 4) +
   our_theme
 ```
+East Cribbing's data seems to end by 2022. This is good to know for our analysis.
 
-It seems that there's variation in dissolved oxygen across the year. What are the monthly spreads?
+
+It seems that there's variation in dissolved oxygen across the year. What do the monthly spreads look like?
 ```{r}
 #looking at monthly averages
 water_quality_stations %>%
   ggplot(aes(x = factor(Month,levels=1:12,labels=month.abb), y = DO_mgl, color = StationName)) +
   geom_boxplot() +
   xlab("Date") +
-  ylab("DO (mgl)") +
-our_theme
+  ylab("Dissolved Oxygen (mgl)") +
+  labs(color = "Station Name") +
+  our_theme
 ```
 
+```{r}
+water_quality_stations %>% 
+  ggplot(aes(x = Temp, y = DO_mgl, color = StationName)) +
+  geom_point() +
+  xlab("Temperature (Celsius)") +
+  ylab("Dissolved Oxygen (mgl)") +
+  labs(color = "Station Name") +
+  our_theme
+```
 
 \newpage
 
