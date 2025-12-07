@@ -404,7 +404,7 @@ stations_wq_nutr_cleaned %>%
 #Looking at temperature vs dissolved oxygen with trend line
 stations_wq_nutr_cleaned %>%
   ggplot(mapping = aes(x=Temp, y=DO_mgl)) +
-  geom_point(size=1) +
+  geom_point(aes(color = StationName), size=1) +
   geom_smooth(
     method = MASS::rlm,
     formula = y ~ x
@@ -437,7 +437,7 @@ stations_wq_nutr_cleaned %>%
 #Looking at nitrate vs dissolved oxygen with trend line
 stations_wq_nutr_cleaned %>%
   ggplot(mapping = aes(x=NO3F, y=DO_mgl)) +
-  geom_point(size=1) +
+  geom_point(aes(color = StationName), size=1) +
   geom_smooth(
     method = MASS::rlm,
     formula = y ~ x
@@ -470,7 +470,7 @@ stations_wq_nutr_cleaned %>%
 #looking at phosphate vs dissolved oxygen with trend line
 stations_wq_nutr_cleaned %>%
   ggplot(mapping = aes(x=PO4F, y=DO_mgl)) +
-  geom_point(size=1) +
+  geom_point(aes(color = StationName), size=1) +
   geom_smooth(
     method = MASS::rlm,
     formula = y ~ x
@@ -504,7 +504,7 @@ stations_wq_nutr_cleaned %>%
 #looking at ammonium vs dissolved oxygen with trend line
 stations_wq_nutr_cleaned %>%
   ggplot(mapping = aes(x=NH4F, y=DO_mgl)) +
-  geom_point(size=1) +
+  geom_point(aes(color = StationName), size=1) +
   geom_smooth(
     method = MASS::rlm,
     formula = y ~ x
@@ -538,10 +538,11 @@ stations_wq_nutr_cleaned %>%
 #Looking at depth vs dissolved oxygen with trend line
 stations_wq_nutr_cleaned %>%
   ggplot(mapping = aes(x=Depth, y=DO_mgl)) +
-  geom_point(size=1) +
+  geom_point(aes(color = StationName), size=1) +
   geom_smooth(
     method = MASS::rlm,
-    formula = y ~ x
+    formula = y ~ x, 
+    color = "black"
   ) +
   xlab("Depth") +
   ylab("Dissolved Oxygen (mgl)") +
