@@ -347,7 +347,7 @@ our_theme <- theme_classic(base_size = 14, base_family = "serif") +
 We're most interested in Dissolved Oxygen across the different monitoring stations. Is there consistent data for us to analyze? Could we identify trends over time?
 ```{r}
 #looking at dissolved oxygen over time for each station
-water_quality_stations %>% 
+stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = Date, y = DO_mgl, color = StationName)) +
   geom_line() +
   xlab("Date") +
@@ -359,7 +359,7 @@ water_quality_stations %>%
 Although plotting DO is helpful for seeing consistent patterns and concentrations across all four stations, let's look at them separately to see gaps and data coverage.
 ```{r}
 #Using facets to plot DO separately for each monitoring station
-water_quality_stations %>%
+stations_wq_nutr_cleaned %>%
   ggplot(mapping = aes(x=Date, y=DO_mgl)) +
   geom_line() +
   xlab("Date") +
@@ -374,7 +374,7 @@ East Cribbing's data seems to end by 2022. This is good to know for our analysis
 It seems that there's variation in dissolved oxygen across the year. What do the monthly spreads look like?
 ```{r}
 #looking at monthly averages
-water_quality_stations %>%
+stations_wq_nutr_cleaned %>%
   ggplot(aes(x = factor(Month,levels=1:12,labels=month.abb), y = DO_mgl, color = StationName)) +
   geom_boxplot() +
   xlab("Date") +
@@ -383,13 +383,170 @@ water_quality_stations %>%
   our_theme
 ```
 
+What's the relationship between temperature and dissolved oxygen?
 ```{r}
-water_quality_stations %>% 
+#Looking at temperature vs dissolved oxygen with trend line
+stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = Temp, y = DO_mgl, color = StationName)) +
   geom_point() +
+  geom_smooth(
+    method = MASS::rlm,
+    formula = y ~ x,
+  aes(color = NULL)) +
   xlab("Temperature (Celsius)") +
   ylab("Dissolved Oxygen (mgl)") +
   labs(color = "Station Name") +
+  scale_x_continuous(limits = c(0, 35)) +
+  our_theme
+```
+
+```{r}
+#Looking at temperature vs dissolved oxygen with trend line
+stations_wq_nutr_cleaned %>%
+  ggplot(mapping = aes(x=Temp, y=DO_mgl)) +
+  geom_point(size=1) +
+  geom_smooth(
+    method = MASS::rlm,
+    formula = y ~ x
+  ) +
+  xlab("Temperature (Celsius)") +
+  ylab("Dissolved Oxygen (mgl)") +
+  theme(axis.text.x = (element_text(size=7))) +
+  scale_x_continuous(limits = c(0, 35)) +
+  facet_wrap(vars(StationName), nrow = 4) +
+  our_theme
+```
+
+What's the relationship between nitrate and dissolved oxygen?
+```{r}
+#Looking at nitrate vs dissolved oxygen with trend line
+stations_wq_nutr_cleaned %>% 
+  ggplot(aes(x = NO3F, y = DO_mgl, color = StationName)) +
+  geom_point() +
+  geom_smooth(
+    method = MASS::rlm,
+    formula = y ~ x,
+  aes(color = NULL)) +
+  xlab("NO3F") +
+  ylab("Dissolved Oxygen (mgl)") +
+  labs(color = "Station Name") +
+  our_theme
+```
+
+```{r}
+#Looking at nitrate vs dissolved oxygen with trend line
+stations_wq_nutr_cleaned %>%
+  ggplot(mapping = aes(x=NO3F, y=DO_mgl)) +
+  geom_point(size=1) +
+  geom_smooth(
+    method = MASS::rlm,
+    formula = y ~ x
+  ) +
+  xlab("NO3F") +
+  ylab("Dissolved Oxygen (mgl)") +
+  theme(axis.text.x = (element_text(size=7))) +
+  facet_wrap(vars(StationName), nrow = 4) +
+  our_theme
+```
+
+What's the relationship between phosphate and dissolved oxygen?
+```{r}
+#Looking at phosphate vs dissolved oxygen with trend line
+stations_wq_nutr_cleaned %>% 
+  ggplot(aes(x = PO4F, y = DO_mgl, color = StationName)) +
+  geom_point() +
+  geom_smooth(
+    method = MASS::rlm,
+    formula = y ~ x,
+  aes(color = NULL)) +
+  xlab("PO4F") +
+  ylab("Dissolved Oxygen (mgl)") +
+  labs(color = "Station Name") +
+  scale_x_continuous(limits = c(-0.001, 0.15)) +
+  our_theme
+```
+
+```{r}
+#looking at phosphate vs dissolved oxygen with trend line
+stations_wq_nutr_cleaned %>%
+  ggplot(mapping = aes(x=PO4F, y=DO_mgl)) +
+  geom_point(size=1) +
+  geom_smooth(
+    method = MASS::rlm,
+    formula = y ~ x
+  ) +
+  xlab("PO4F") +
+  ylab("Dissolved Oxygen (mgl)") +
+  theme(axis.text.x = (element_text(size=7))) +
+  facet_wrap(vars(StationName), nrow = 4) +
+  scale_x_continuous(limits = c(-0.001, 0.15)) +
+  our_theme
+```
+
+Ammonium?
+```{r}
+#Looking at ammonium vs dissolved oxygen with trend line
+stations_wq_nutr_cleaned %>% 
+  ggplot(aes(x = NH4F, y = DO_mgl, color = StationName)) +
+  geom_point() +
+  geom_smooth(
+    method = MASS::rlm,
+    formula = y ~ x,
+  aes(color = NULL)) +
+  xlab("NH4F") +
+  ylab("Dissolved Oxygen (mgl)") +
+  labs(color = "Station Name") +
+  scale_x_continuous(limits = c(-0.01, 0.5)) +
+  our_theme
+```
+
+```{r}
+#looking at ammonium vs dissolved oxygen with trend line
+stations_wq_nutr_cleaned %>%
+  ggplot(mapping = aes(x=NH4F, y=DO_mgl)) +
+  geom_point(size=1) +
+  geom_smooth(
+    method = MASS::rlm,
+    formula = y ~ x
+  ) +
+  xlab("NH4F") +
+  ylab("Dissolved Oxygen (mgl)") +
+  theme(axis.text.x = (element_text(size=7))) +
+  facet_wrap(vars(StationName), nrow = 4) +
+  scale_x_continuous(limits = c(-0.01, 0.5)) +
+  our_theme
+```
+
+Depth
+What's the relationship between temperature and dissolved oxygen?
+```{r}
+#Looking at depth vs dissolved oxygen with trend line
+stations_wq_nutr_cleaned %>% 
+  ggplot(aes(x = Depth, y = DO_mgl, color = StationName)) +
+  geom_point() +
+  geom_smooth(
+    method = MASS::rlm,
+    formula = y ~ x,
+  aes(color = NULL)) +
+  xlab("Depth") +
+  ylab("Dissolved Oxygen (mgl)") +
+  labs(color = "Station Name") +
+  our_theme
+```
+
+```{r}
+#Looking at depth vs dissolved oxygen with trend line
+stations_wq_nutr_cleaned %>%
+  ggplot(mapping = aes(x=Depth, y=DO_mgl)) +
+  geom_point(size=1) +
+  geom_smooth(
+    method = MASS::rlm,
+    formula = y ~ x
+  ) +
+  xlab("Depth") +
+  ylab("Dissolved Oxygen (mgl)") +
+  theme(axis.text.x = (element_text(size=7))) +
+  facet_wrap(vars(StationName), nrow = 4) +
   our_theme
 ```
 
