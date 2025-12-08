@@ -16,6 +16,8 @@ library(tidyverse)
 library(readr)
 library(dplyr)
 library(cowplot)
+library(corrplot)
+library(GGally)
 
 here()
 ```
@@ -344,6 +346,28 @@ our_theme <- theme_classic(base_size = 14, base_family = "serif") +
         rect = element_rect(color = "#ffffff"))
 ```
 
+Building Correlation Matrix
+```{r}
+num_data <- stations_wq_nutr_cleaned[, c("Temp", "DO_mgl", "Depth",
+                                         "pH", "PO4F", "NH4F", "NO3F",
+                                         "CHLA_N", "Month")]
+cor_matrix <- cor(num_data, use = "pairwise.complete.obs", method = "pearson")
+
+```
+
+corrplot
+```{r}
+corrplot(cor_matrix, method = "color", type = "upper",
+         tl.col = "black", tl.srt = 45)
+```
+
+ggpairs
+```{r}
+ggpairs(num_data)
+```
+
+
+
 We're most interested in Dissolved Oxygen across the different monitoring stations. Is there consistent data for us to analyze? Could we identify trends over time?
 ```{r}
 #looking at dissolved oxygen over time for each station
@@ -361,7 +385,7 @@ Although plotting DO is helpful for seeing consistent patterns and concentration
 #Using facets to plot DO separately for each monitoring station
 stations_wq_nutr_cleaned %>%
   ggplot(mapping = aes(x=Date, y=DO_mgl)) +
-  geom_line() +
+  geom_line(aes(color = StationName),) +
   xlab("Date") +
   ylab("Dissolved Oxygen (mgl)") +
   theme(axis.text.x = (element_text(size=7))) +
@@ -369,7 +393,6 @@ stations_wq_nutr_cleaned %>%
   our_theme
 ```
 East Cribbing's data seems to end by 2022. This is good to know for our analysis.
-
 
 It seems that there's variation in dissolved oxygen across the year. What do the monthly spreads look like?
 ```{r}
@@ -385,171 +408,468 @@ stations_wq_nutr_cleaned %>%
 
 What's the relationship between temperature and dissolved oxygen?
 ```{r}
-#Looking at temperature vs dissolved oxygen with trend line
-stations_wq_nutr_cleaned %>% 
+Temp_x_limits <- c(0, 35)
+
+Temp_DO_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = Temp, y = DO_mgl, color = StationName)) +
-  geom_point() +
-  geom_smooth(
-    method = MASS::rlm,
-    formula = y ~ x,
-  aes(color = NULL)) +
+  geom_point(size = 1.8, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x, 
+              se = FALSE, aes(color = NULL)) +
   xlab("Temperature (Celsius)") +
-  ylab("Dissolved Oxygen (mgl)") +
-  labs(color = "Station Name") +
-  scale_x_continuous(limits = c(0, 35)) +
-  our_theme
+  ylab("Dissolved Oxygen (mg/L)") +
+  scale_x_continuous(limits = Temp_x_limits) +
+  our_theme +
+  theme(legend.position = "none")      # legend on right for combined figure
+
+Temp_DO_faceted <- stations_wq_nutr_cleaned %>%
+  ggplot(aes(x = Temp, y = DO_mgl, color = StationName)) +
+  geom_point(size = 1.4, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x,
+              se = FALSE,
+              aes(color = NULL)) +
+  facet_wrap(vars(StationName), nrow = 4) +
+  xlab("Temperature (Celsius)") +
+  ylab(NULL) +
+  scale_x_continuous(limits = Temp_x_limits) +
+  our_theme +
+  theme(legend.position = "none")
+
+plot_grid(
+  Temp_DO_combined,
+  Temp_DO_faceted,
+  ncol = 2,          # side-by-side layout
+  rel_widths = c(1, 1)  # adjust width proportions if needed
+)
 ```
 
-```{r}
-#Looking at temperature vs dissolved oxygen with trend line
-stations_wq_nutr_cleaned %>%
-  ggplot(mapping = aes(x=Temp, y=DO_mgl)) +
-  geom_point(aes(color = StationName), size=1) +
-  geom_smooth(
-    method = MASS::rlm,
-    formula = y ~ x
-  ) +
-  xlab("Temperature (Celsius)") +
-  ylab("Dissolved Oxygen (mgl)") +
-  theme(axis.text.x = (element_text(size=7))) +
-  scale_x_continuous(limits = c(0, 35)) +
-  facet_wrap(vars(StationName), nrow = 4) +
-  our_theme
-```
 
 What's the relationship between nitrate and dissolved oxygen?
 ```{r}
-#Looking at nitrate vs dissolved oxygen with trend line
-stations_wq_nutr_cleaned %>% 
+NO3F_DO_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = NO3F, y = DO_mgl, color = StationName)) +
-  geom_point() +
-  geom_smooth(
-    method = MASS::rlm,
-    formula = y ~ x,
-  aes(color = NULL)) +
-  xlab("NO3F") +
-  ylab("Dissolved Oxygen (mgl)") +
-  labs(color = "Station Name") +
-  our_theme
-```
+  geom_point(size = 1.8, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x, 
+              se = FALSE, aes(color = NULL)) +
+  xlab("Nitrate") +
+  ylab("Dissolved Oxygen (mg/L)") +
+  our_theme +
+  theme(legend.position = "none")      # legend on right for combined figure
 
-```{r}
-#Looking at nitrate vs dissolved oxygen with trend line
-stations_wq_nutr_cleaned %>%
-  ggplot(mapping = aes(x=NO3F, y=DO_mgl)) +
-  geom_point(aes(color = StationName), size=1) +
-  geom_smooth(
-    method = MASS::rlm,
-    formula = y ~ x
-  ) +
-  xlab("NO3F") +
-  ylab("Dissolved Oxygen (mgl)") +
-  theme(axis.text.x = (element_text(size=7))) +
+NO3F_DO_faceted <- stations_wq_nutr_cleaned %>%
+  ggplot(aes(x = NO3F, y = DO_mgl, color = StationName)) +
+  geom_point(size = 1.4, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x,
+              se = FALSE,
+              aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
-  our_theme
+  xlab("Nitrate") +
+  ylab(NULL) +
+  our_theme +
+  theme(legend.position = "none")
+
+plot_grid(
+  NO3F_DO_combined,
+  NO3F_DO_faceted,
+  ncol = 2,          # side-by-side layout
+  rel_widths = c(1, 1)  # adjust width proportions if needed
+)
 ```
 
 What's the relationship between phosphate and dissolved oxygen?
 ```{r}
-#Looking at phosphate vs dissolved oxygen with trend line
-stations_wq_nutr_cleaned %>% 
-  ggplot(aes(x = PO4F, y = DO_mgl, color = StationName)) +
-  geom_point() +
-  geom_smooth(
-    method = MASS::rlm,
-    formula = y ~ x,
-  aes(color = NULL)) +
-  xlab("PO4F") +
-  ylab("Dissolved Oxygen (mgl)") +
-  labs(color = "Station Name") +
-  scale_x_continuous(limits = c(-0.001, 0.15)) +
-  our_theme
-```
+PO4F_x_limits <- c(-0.001, 0.15)
 
-```{r}
-#looking at phosphate vs dissolved oxygen with trend line
-stations_wq_nutr_cleaned %>%
-  ggplot(mapping = aes(x=PO4F, y=DO_mgl)) +
-  geom_point(aes(color = StationName), size=1) +
-  geom_smooth(
-    method = MASS::rlm,
-    formula = y ~ x
-  ) +
+PO4F_DO_combined <- stations_wq_nutr_cleaned %>% 
+  ggplot(aes(x = PO4F, y = DO_mgl, color = StationName)) +
+  geom_point(size = 1.8, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm, formula = y ~ x, se = FALSE, aes(color = NULL)) +
   xlab("PO4F") +
-  ylab("Dissolved Oxygen (mgl)") +
-  theme(axis.text.x = (element_text(size=7))) +
+  ylab("Dissolved Oxygen (mg/L)") +
+  scale_x_continuous(limits = x_limits) +
+  our_theme +
+  theme(legend.position = "none")      # legend on right for combined figure
+
+PO4F_DO_faceted <- stations_wq_nutr_cleaned %>%
+  ggplot(aes(x = PO4F, y = DO_mgl, color = StationName)) +
+  geom_point(size = 1.4, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm, formula = y ~ x, se = FALSE, aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
-  scale_x_continuous(limits = c(-0.001, 0.15)) +
-  our_theme
+  xlab("PO4F") +
+  ylab(NULL) +
+  scale_x_continuous(limits = x_limits) +
+  our_theme +
+  theme(legend.position = "none")
+
+plot_grid(
+  PO4F_DO_combined,
+  PO4F_DO_faceted,
+  ncol = 2,          # side-by-side layout
+  rel_widths = c(1, 1)  # adjust width proportions if needed
+)
 ```
 
 Ammonium?
 ```{r}
-#Looking at ammonium vs dissolved oxygen with trend line
-stations_wq_nutr_cleaned %>% 
+NH4F_x_limits <- c(-0.01, 0.5)
+
+NH4F_DO_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = NH4F, y = DO_mgl, color = StationName)) +
-  geom_point() +
-  geom_smooth(
-    method = MASS::rlm,
-    formula = y ~ x,
-  aes(color = NULL)) +
-  xlab("NH4F") +
-  ylab("Dissolved Oxygen (mgl)") +
-  labs(color = "Station Name") +
-  scale_x_continuous(limits = c(-0.01, 0.5)) +
-  our_theme
+  geom_point(size = 1.8, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x, 
+              se = FALSE, aes(color = NULL)) +
+  xlab("Ammonium") +
+  ylab("Dissolved Oxygen (mg/L)") +
+  scale_x_continuous(limits = NH4F_x_limits) +
+  our_theme +
+  theme(legend.position = "none")      # legend on right for combined figure
+
+NH4F_DO_faceted <- stations_wq_nutr_cleaned %>%
+  ggplot(aes(x = NH4F, y = DO_mgl, color = StationName)) +
+  geom_point(size = 1.4, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x,
+              se = FALSE,
+              aes(color = NULL)) +
+  facet_wrap(vars(StationName), nrow = 4) +
+  xlab("Ammonium") +
+  ylab(NULL) +
+  scale_x_continuous(limits = NH4F_x_limits) +
+  our_theme +
+  theme(legend.position = "none")
+
+plot_grid(
+  NH4F_DO_combined,
+  NH4F_DO_faceted,
+  ncol = 2,          # side-by-side layout
+  rel_widths = c(1, 1)  # adjust width proportions if needed
+)
 ```
 
-```{r}
-#looking at ammonium vs dissolved oxygen with trend line
-stations_wq_nutr_cleaned %>%
-  ggplot(mapping = aes(x=NH4F, y=DO_mgl)) +
-  geom_point(aes(color = StationName), size=1) +
-  geom_smooth(
-    method = MASS::rlm,
-    formula = y ~ x
-  ) +
-  xlab("NH4F") +
-  ylab("Dissolved Oxygen (mgl)") +
-  theme(axis.text.x = (element_text(size=7))) +
-  facet_wrap(vars(StationName), nrow = 4) +
-  scale_x_continuous(limits = c(-0.01, 0.5)) +
-  our_theme
-```
 
 Depth
 What's the relationship between temperature and dissolved oxygen?
 ```{r}
-#Looking at depth vs dissolved oxygen with trend line
-stations_wq_nutr_cleaned %>% 
+Depth_DO_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = Depth, y = DO_mgl, color = StationName)) +
-  geom_point() +
-  geom_smooth(
-    method = MASS::rlm,
-    formula = y ~ x,
-  aes(color = NULL)) +
+  geom_point(size = 1.8, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x, 
+              se = FALSE, aes(color = NULL)) +
   xlab("Depth") +
-  ylab("Dissolved Oxygen (mgl)") +
+  ylab("Dissolved Oxygen (mg/L)") +
+  our_theme +
+  theme(legend.position = "none")      # legend on right for combined figure
+
+Depth_DO_faceted <- stations_wq_nutr_cleaned %>%
+  ggplot(aes(x = Depth, y = DO_mgl, color = StationName)) +
+  geom_point(size = 1.4, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x,
+              se = FALSE,
+              aes(color = NULL)) +
+  facet_wrap(vars(StationName), nrow = 4) +
+  xlab("Depth") +
+  ylab(NULL) +
+  our_theme +
+  theme(legend.position = "none")
+
+plot_grid(
+  Depth_DO_combined,
+  Depth_DO_faceted,
+  ncol = 2,          # side-by-side layout
+  rel_widths = c(1, 1)  # adjust width proportions if needed
+)
+```
+
+We are also interested in Chlorophyll, as it can indicate algal blooms.
+
+```{r}
+#looking at chlorophyll over time for each station
+stations_wq_nutr_cleaned %>% 
+  ggplot(aes(x = Date, y = CHLA_N, color = StationName)) +
+  geom_line() +
+  xlab("Date") +
+  ylab("CHLA_N") +
   labs(color = "Station Name") +
   our_theme
 ```
 
+Although plotting Chlorophyll is helpful for seeing consistent patterns and concentrations across all four stations, let's look at them separately to see gaps and data coverage.
 ```{r}
-#Looking at depth vs dissolved oxygen with trend line
+#Using facets to plot chlorophyll separately for each monitoring station
 stations_wq_nutr_cleaned %>%
-  ggplot(mapping = aes(x=Depth, y=DO_mgl)) +
-  geom_point(aes(color = StationName), size=1) +
-  geom_smooth(
-    method = MASS::rlm,
-    formula = y ~ x, 
-    color = "black"
-  ) +
-  xlab("Depth") +
-  ylab("Dissolved Oxygen (mgl)") +
+  ggplot(mapping = aes(x=Date, y=CHLA_N)) +
+  geom_line(aes(color = StationName),) +
+  xlab("Date") +
+  ylab("CHLA_N") +
   theme(axis.text.x = (element_text(size=7))) +
   facet_wrap(vars(StationName), nrow = 4) +
+  scale_y_continuous(limits = c(0,75)) +
   our_theme
 ```
+Loosin Creek and Research Creek seem to have less fluctuation in their Chlorophyll than East Cribbbing and Zeke's Basin. Could it do with differences in depth or other variables?
+
+It seems that there's variation in chlorophyll across the year. What do the monthly spreads look like?
+```{r}
+#looking at monthly averages
+stations_wq_nutr_cleaned %>%
+  ggplot(aes(x = factor(Month,levels=1:12,labels=month.abb), y = CHLA_N, color = StationName)) +
+  geom_boxplot() +
+  xlab("Date") +
+  ylab("CHLA_N") +
+  labs(color = "Station Name") +
+  scale_y_continuous(limits = c(0,75)) +
+  our_theme
+```
+
+What's the relationship between temperature and chlorophpyll?
+```{r}
+#Looking at temperature vs dissolved oxygen with trend line
+Temp_x_limits <- c(0, 35)
+CHLA_N_y_limits <- c(0,75)
+
+Temp_CHLA_N_combined <- stations_wq_nutr_cleaned %>% 
+  ggplot(aes(x = Temp, y = CHLA_N, color = StationName)) +
+  geom_point(size = 1.8, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x, 
+              se = FALSE, aes(color = NULL)) +
+  xlab("Temperature (Celsius)") +
+  ylab("CHLA_N") +
+  scale_x_continuous(limits = Temp_x_limits) +
+  scale_y_continuous(limits = CHLA_N_y_limits) +
+  our_theme +
+  theme(legend.position = "none")      # legend on right for combined figure
+
+Temp_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
+  ggplot(aes(x = Temp, y = CHLA_N, color = StationName)) +
+  geom_point(size = 1.4, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x,
+              se = FALSE,
+              aes(color = NULL)) +
+  facet_wrap(vars(StationName), nrow = 4) +
+  xlab("Temperature (Celsius)") +
+  ylab(NULL) +
+  scale_x_continuous(limits = Temp_x_limits) +
+  scale_y_continuous(limits = CHLA_N_y_limits) +
+  our_theme +
+  theme(legend.position = "none")
+
+plot_grid(
+  Temp_CHLA_N_combined,
+  Temp_CHLA_N_faceted,
+  ncol = 2,          # side-by-side layout
+  rel_widths = c(1, 1)  # adjust width proportions if needed
+)
+```
+
+What's the relationship between nitrate and dissolved oxygen?
+```{r}
+#Looking at nitrate vs chlorophyll with trend line
+CHLA_N_y_limits <- c(0,75)
+
+NO3F_CHLA_N_combined <- stations_wq_nutr_cleaned %>% 
+  ggplot(aes(x = NO3F, y = CHLA_N, color = StationName)) +
+  geom_point(size = 1.8, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x, 
+              se = FALSE, aes(color = NULL)) +
+  xlab("Nitrate") +
+  ylab("CHLA_N") +
+  scale_y_continuous(limits = CHLA_N_y_limits) +
+  our_theme +
+  theme(legend.position = "none")      # legend on right for combined figure
+
+NO3F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
+  ggplot(aes(x = NO3F, y = CHLA_N, color = StationName)) +
+  geom_point(size = 1.4, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x,
+              se = FALSE,
+              aes(color = NULL)) +
+  facet_wrap(vars(StationName), nrow = 4) +
+  xlab("Nitrate") +
+  ylab(NULL) +
+  scale_y_continuous(limits = CHLA_N_y_limits) +
+  our_theme +
+  theme(legend.position = "none")
+
+plot_grid(
+  NO3F_CHLA_N_combined,
+  NO3F_CHLA_N_faceted,
+  ncol = 2,          # side-by-side layout
+  rel_widths = c(1, 1)  # adjust width proportions if needed
+)
+```
+
+What's the relationship between phosphate and dissolved oxygen?
+```{r}
+#looking at phosphate vs chlorophyll with trend line
+PO4F_x_limits <- c(-0.001, 0.15)
+CHLA_N_y_limits <- c(0,75)
+
+PO4F_CHLA_N_combined <- stations_wq_nutr_cleaned %>% 
+  ggplot(aes(x = PO4F, y = CHLA_N, color = StationName)) +
+  geom_point(size = 1.8, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x, 
+              se = FALSE, aes(color = NULL)) +
+  xlab("Phosphate") +
+  ylab("CHLA_N") +
+  scale_x_continuous(limits = PO4F_x_limits) +
+  scale_y_continuous(limits = CHLA_N_y_limits) +
+  our_theme +
+  theme(legend.position = "none")      # legend on right for combined figure
+
+PO4F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
+  ggplot(aes(x = PO4F, y = CHLA_N, color = StationName)) +
+  geom_point(size = 1.4, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x,
+              se = FALSE,
+              aes(color = NULL)) +
+  facet_wrap(vars(StationName), nrow = 4) +
+  xlab("Phosphate") +
+  ylab(NULL) +
+  scale_x_continuous(limits = PO4F_x_limits) +
+  scale_y_continuous(limits = CHLA_N_y_limits) +
+  our_theme +
+  theme(legend.position = "none")
+
+plot_grid(
+  PO4F_CHLA_N_combined,
+  PO4F_CHLA_N_faceted,
+  ncol = 2,          # side-by-side layout
+  rel_widths = c(1, 1)  # adjust width proportions if needed
+)
+```
+
+Ammonium?
+```{r}
+#Looking at ammonium vs chlorophyll with trend line
+NH4F_x_limits <- c(-0.01, 0.5)
+CHLA_N_y_limits <- c(0,75)
+
+NH4F_CHLA_N_combined <- stations_wq_nutr_cleaned %>% 
+  ggplot(aes(x = NH4F, y = CHLA_N, color = StationName)) +
+  geom_point(size = 1.8, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x, 
+              se = FALSE, aes(color = NULL)) +
+  xlab("Ammonium") +
+  ylab("CHLA_N") +
+  scale_x_continuous(limits = NH4F_x_limits) +
+  scale_y_continuous(limits = CHLA_N_y_limits) +
+  our_theme +
+  theme(legend.position = "none")      # legend on right for combined figure
+
+NH4F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
+  ggplot(aes(x = NH4F, y = CHLA_N, color = StationName)) +
+  geom_point(size = 1.4, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x,
+              se = FALSE,
+              aes(color = NULL)) +
+  facet_wrap(vars(StationName), nrow = 4) +
+  xlab("Ammonium") +
+  ylab(NULL) +
+  scale_x_continuous(limits = NH4F_x_limits) +
+  scale_y_continuous(limits = CHLA_N_y_limits) +
+  our_theme +
+  theme(legend.position = "none")
+
+plot_grid(
+  NH4F_CHLA_N_combined,
+  NH4F_CHLA_N_faceted,
+  ncol = 2,          # side-by-side layout
+  rel_widths = c(1, 1)  # adjust width proportions if needed
+)
+```
+
+Depth
+```{r}
+#Looking at depth vs chlorophyll with trend line
+CHLA_N_y_limits <- c(0,75)
+
+Depth_CHLA_N_combined <- stations_wq_nutr_cleaned %>% 
+  ggplot(aes(x = Depth, y = CHLA_N, color = StationName)) +
+  geom_point(size = 1.8, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x, 
+              se = FALSE, aes(color = NULL)) +
+  xlab("Depth") +
+  ylab("CHLA_N") +
+  scale_y_continuous(limits = CHLA_N_y_limits) +
+  our_theme +
+  theme(legend.position = "none")      # legend on right for combined figure
+
+Depth_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
+  ggplot(aes(x = Depth, y = CHLA_N, color = StationName)) +
+  geom_point(size = 1.4, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x,
+              se = FALSE,
+              aes(color = NULL)) +
+  facet_wrap(vars(StationName), nrow = 4) +
+  xlab("Depth") +
+  ylab(NULL) +
+  scale_y_continuous(limits = CHLA_N_y_limits) +
+  our_theme +
+  theme(legend.position = "none")
+
+plot_grid(
+  Depth_CHLA_N_combined,
+  Depth_CHLA_N_faceted,
+  ncol = 2,          # side-by-side layout
+  rel_widths = c(1, 1)  # adjust width proportions if needed
+)
+```
+
+Now, what does the relationship between dissolved oxygen and chlorophyll look like?
+```{r}
+#Looking at dissolved oxygen vs chlorophyll with trend line
+CHLA_N_x_limits <- c(0,75)
+
+DO_CHLA_N_combined <- stations_wq_nutr_cleaned %>% 
+  ggplot(aes(x = CHLA_N, y = DO_mgl, color = StationName)) +
+  geom_point(size = 1.8, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x, 
+              se = FALSE, aes(color = NULL)) +
+  xlab("CHLA_N") +
+  ylab("Dissolved Oxygen (mg/L)") +
+  scale_x_continuous(limits = CHLA_N_x_limits) +
+  our_theme +
+  theme(legend.position = "none")      # legend on right for combined figure
+
+DO_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
+  ggplot(aes(x = CHLA_N, y = DO_mgl, color = StationName)) +
+  geom_point(size = 1.4, alpha = 0.8) +
+  geom_smooth(method = MASS::rlm,
+              formula = y ~ x,
+              se = FALSE,
+              aes(color = NULL)) +
+  facet_wrap(vars(StationName), nrow = 4) +
+  xlab("CHLA_N") +
+  ylab(NULL) +
+  scale_x_continuous(limits = CHLA_N_x_limits) +
+  our_theme +
+  theme(legend.position = "none")
+
+plot_grid(
+  DO_CHLA_N_combined,
+  DO_CHLA_N_faceted,
+  ncol = 2,          # side-by-side layout
+  rel_widths = c(1, 1)  # adjust width proportions if needed
+)
+```
+
 
 \newpage
 
