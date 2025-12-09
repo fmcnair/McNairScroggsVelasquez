@@ -47,7 +47,7 @@ here()
 Exploration of the raw data consisted of understanding the number of files and contents of those files for each Station. Originally, the water quality data and the nutrient data were separate for each station we are studying. We uploaded all of the files with nutrient and water quality data from the four stations we are studying for the years 2002-2024. We obtained a separate file with information about the stations in which the data was collected. 
 
 ```{r import of raw data, message=FALSE, warning=FALSE, include=FALSE}
-sampling_stations <- read_csv("sampling_stations.csv")
+sampling_stations <- read_csv("Data/sampling_stations.csv")
 
 # Importing the data within each folder as one and then combining data from each folder into their own datasets since they have the same columns
 
@@ -364,7 +364,7 @@ cor_matrix <- cor(num_data, use = "pairwise.complete.obs", method = "pearson")
 ```
 
 ggpairs
-```{r}
+```{r, warning=FALSE}
 ggpairs(num_data)
 ```
 
@@ -496,7 +496,7 @@ PO4F_DO_combined <- stations_wq_nutr_cleaned %>%
   geom_smooth(method = MASS::rlm, formula = y ~ x, se = FALSE, aes(color = NULL)) +
   xlab("PO4F") +
   ylab("Dissolved Oxygen (mg/L)") +
-  scale_x_continuous(limits = x_limits) +
+  scale_x_continuous(limits = PO4F_x_limits) +
   our_theme +
   theme(legend.position = "none")      # legend on right for combined figure
 
@@ -507,7 +507,7 @@ PO4F_DO_faceted <- stations_wq_nutr_cleaned %>%
   facet_wrap(vars(StationName), nrow = 4) +
   xlab("PO4F") +
   ylab(NULL) +
-  scale_x_continuous(limits = x_limits) +
+  scale_x_continuous(limits = PO4F_x_limits) +
   our_theme +
   theme(legend.position = "none")
 
@@ -1086,8 +1086,6 @@ ZekesBasinDO.monthly.nonseas.trend <- trend::mk.test(ZekesBasinDO.monthly.nonsea
 # Inspect results
 ZekesBasinDO.monthly.nonseas.trend
 ```
-
-
 All Monitoring Stations have had statistically significant trends in their Dissolved Oxygen.
 
 What about chlorophyll?
@@ -1288,6 +1286,916 @@ ZekeBasinCHLA.monthly.nonseas.trend <- trend::mk.test(ZekeBasinCHLA.monthly.nons
 # Inspect results
 ZekeBasinCHLA.monthly.nonseas.trend
 ```
+All of the stations have statistically significant trends in their DO and Chlorophyll levels. So now we ask, which variables are most responsible for these changes?  
+
+```{r}
+#DO
+stations_wo_na <- stations_wq_nutr_cleaned[complete.cases(
+  stations_wq_nutr_cleaned[, c("DO_mgl","Temp","PO4F","NH4F","NO3F", "CHLA_N")]), ]
+
+DO.AIC <- lm(data = stations_wo_na, DO_mgl~ Temp + PO4F + NH4F + NO3F)
+step(DO.AIC)
+
+DO.regression <- lm(data = stations_wq_nutr_cleaned, DO_mgl~ Temp + PO4F
+                      + NO3F)
+summary(DO.regression)
+```
+```{r}
+CHLA.AIC <- lm(data = stations_wo_na, CHLA_N~ Temp + PO4F + NH4F + NO3F)
+step(CHLA.AIC)
+
+CHLA.regression <- lm(data = stations_wq_nutr_cleaned, CHLA_N~ Temp + PO4F
+                      + NH4F)
+summary(CHLA.regression)
+```
+From these multiple regressions we find that temperature, phosphorus, and nitrate are the best variables for predicting DO and temperature, phosphorus, and ammonium are the best variables for predicting Chlorophyll. Both of these relationships are significant, although the R-squared for the Chlorophyll regression is 0.1661 which indicates a weaker correlation. 
+
+Temperature is the most impactful variable in both of the models, with PO4 being the least impactful. 
+
+From here, we perform time series analyses on these variables to determine if their trends are in line with what we expect. 
+
+Here are the variables for East Cribbing. 
+```{r}
+#PO4 - East Cribbing
+EastCribbing_PO4_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "East Cribbing") %>% 
+  select(Date, PO4F, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+EastCribbing_PO4_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(EastCribbing_PO4_months) <- "Date"
+
+#Left joining to point out gaps
+EastCribbing_PO4_timeseries_ready <- left_join(EastCribbing_PO4_months, 
+                                               EastCribbing_PO4_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in PO4
+EastCribbing_PO4_timeseries_ready$PO4 = 
+  zoo::na.approx(EastCribbing_PO4_timeseries_ready$PO4)
+
+#Creating time series for East Cribbing's PO4
+EastCribbing.PO4.monthly.ts <- ts(EastCribbing_PO4_timeseries_ready$PO4, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+EastCribbing.PO4.monthly.decomposed <- stl(EastCribbing.PO4.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(EastCribbing.PO4.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+EastCribbing.PO4.monthly.trend <- 
+  Kendall::SeasonalMannKendall(EastCribbing.PO4.monthly.ts)
+
+summary(EastCribbing.PO4.monthly.trend)
+
+#subtracting seasonal component from our ts object
+EastCribbing.PO4.monthly.nonseas <- (EastCribbing.PO4.monthly.ts - 
+                                       EastCribbing.PO4.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(EastCribbing.PO4.monthly.nonseas)
+plot(EastCribbing.PO4.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+EastCribbing.PO4.monthly.nonseas.trend <- trend::mk.test(EastCribbing.PO4.monthly.nonseas)
+# Inspect results
+EastCribbing.PO4.monthly.nonseas.trend
+```
+Increasing trend of PO4, significant. 
+```{r}
+#NH4 - East Cribbing
+EastCribbing_NH4_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "East Cribbing") %>% 
+  select(Date, NH4F, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+EastCribbing_NH4_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(EastCribbing_NH4_months) <- "Date"
+
+#Left joining to point out gaps
+EastCribbing_NH4_timeseries_ready <- left_join(EastCribbing_NH4_months, 
+                                               EastCribbing_NH4_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in CHLA
+EastCribbing_NH4_timeseries_ready$NH4 = 
+  zoo::na.approx(EastCribbing_NH4_timeseries_ready$NH4)
+
+#Creating time series for Zeke's Basin's CHLA
+EastCribbing.NH4.monthly.ts <- ts(EastCribbing_NH4_timeseries_ready$NH4, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+EastCribbing.NH4.monthly.decomposed <- stl(EastCribbing.NH4.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(EastCribbing.NH4.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+EastCribbing.NH4.monthly.trend <- 
+  Kendall::SeasonalMannKendall(EastCribbing.NH4.monthly.ts)
+
+summary(EastCribbing.NH4.monthly.trend)
+
+#subtracting seasonal component from our ts object
+EastCribbing.NH4.monthly.nonseas <- (EastCribbing.NH4.monthly.ts - 
+                                       EastCribbing.NH4.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(EastCribbing.NH4.monthly.nonseas)
+plot(EastCribbing.NH4.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+EastCribbing.NH4.monthly.nonseas.trend <- trend::mk.test(EastCribbing.NH4.monthly.nonseas)
+# Inspect results
+EastCribbing.NH4.monthly.nonseas.trend
+```
+Decreasing trend of NH4, significant. 
+```{r}
+#NO3 - East Cribbing
+EastCribbing_NO3_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "East Cribbing") %>% 
+  select(Date, NO3F, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+EastCribbing_NO3_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(EastCribbing_NO3_months) <- "Date"
+
+#Left joining to point out gaps
+EastCribbing_NO3_timeseries_ready <- left_join(EastCribbing_NO3_months, 
+                                               EastCribbing_NO3_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in CHLA
+EastCribbing_NO3_timeseries_ready$NO3 = 
+  zoo::na.approx(EastCribbing_NO3_timeseries_ready$NO3)
+
+#Creating time series for Zeke's Basin's CHLA
+EastCribbing.NO3.monthly.ts <- ts(EastCribbing_NO3_timeseries_ready$NO3, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+EastCribbing.NO3.monthly.decomposed <- stl(EastCribbing.NO3.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(EastCribbing.NO3.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+EastCribbing.NO3.monthly.trend <- 
+  Kendall::SeasonalMannKendall(EastCribbing.NO3.monthly.ts)
+
+summary(EastCribbing.NO3.monthly.trend)
+
+#subtracting seasonal component from our ts object
+EastCribbing.NO3.monthly.nonseas <- (EastCribbing.NO3.monthly.ts - 
+                                       EastCribbing.NO3.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(EastCribbing.NO3.monthly.nonseas)
+plot(EastCribbing.NO3.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+EastCribbing.NO3.monthly.nonseas.trend <- trend::mk.test(EastCribbing.NO3.monthly.nonseas)
+# Inspect results
+EastCribbing.NO3.monthly.nonseas.trend
+```
+Insignificant trend. 
+```{r}
+#Temp - East Cribbing
+EastCribbing_Temp_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "East Cribbing") %>% 
+  select(Date, Temp, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+EastCribbing_Temp_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2021/11/01"),
+                                 by="month"))
+colnames(EastCribbing_Temp_months) <- "Date"
+
+#Left joining to point out gaps
+EastCribbing_Temp_timeseries_ready <- left_join(EastCribbing_Temp_months, 
+                                               EastCribbing_Temp_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in Temp
+EastCribbing_Temp_timeseries_ready$Temp = 
+  zoo::na.approx(EastCribbing_Temp_timeseries_ready$Temp)
+
+#Creating time series for East Cribbing's Temp
+EastCribbing.Temp.monthly.ts <- ts(EastCribbing_Temp_timeseries_ready$Temp, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+EastCribbing.Temp.monthly.decomposed <- stl(EastCribbing.Temp.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(EastCribbing.Temp.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+EastCribbing.Temp.monthly.trend <- 
+  Kendall::SeasonalMannKendall(EastCribbing.Temp.monthly.ts)
+
+summary(EastCribbing.Temp.monthly.trend)
+
+#subtracting seasonal component from our ts object
+EastCribbing.Temp.monthly.nonseas <- (EastCribbing.Temp.monthly.ts - 
+                                       EastCribbing.Temp.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(EastCribbing.Temp.monthly.nonseas)
+plot(EastCribbing.Temp.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+EastCribbing.Temp.monthly.nonseas.trend <- trend::mk.test(EastCribbing.Temp.monthly.nonseas)
+# Inspect results
+EastCribbing.Temp.monthly.nonseas.trend
+```
+Insignificant trend. 
+
+For East Cribbing, PO4 had a significant increasing trend and NH4 has a significant decreasing trend. 
+
+Now let's do Loosin Creek. 
+```{r}
+#PO4 - Loosin Creek
+LoosinCreek_PO4_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "Loosin Creek") %>% 
+  select(Date, PO4F, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+LoosinCreek_PO4_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(LoosinCreek_PO4_months) <- "Date"
+
+#Left joining to point out gaps
+LoosinCreek_PO4_timeseries_ready <- left_join(LoosinCreek_PO4_months, 
+                                               LoosinCreek_PO4_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in PO4
+LoosinCreek_PO4_timeseries_ready$PO4 = 
+  zoo::na.approx(LoosinCreek_PO4_timeseries_ready$PO4)
+
+#Creating time series for Loosin Creek's PO4
+LoosinCreek.PO4.monthly.ts <- ts(LoosinCreek_PO4_timeseries_ready$PO4, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+LoosinCreek.PO4.monthly.decomposed <- stl(LoosinCreek.PO4.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(LoosinCreek.PO4.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+LoosinCreek.PO4.monthly.trend <- 
+  Kendall::SeasonalMannKendall(LoosinCreek.PO4.monthly.ts)
+
+summary(LoosinCreek.PO4.monthly.trend)
+
+#subtracting seasonal component from our ts object
+LoosinCreek.PO4.monthly.nonseas <- (LoosinCreek.PO4.monthly.ts - 
+                                       LoosinCreek.PO4.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(LoosinCreek.PO4.monthly.nonseas)
+plot(LoosinCreek.PO4.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+LoosinCreek.PO4.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.PO4.monthly.nonseas)
+# Inspect results
+LoosinCreek.PO4.monthly.nonseas.trend
+```
+Non seasonal trend is significantly decreasing. 
+```{r}
+#NH4 - Loosin Creek
+LoosinCreek_NH4_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "Loosin Creek") %>% 
+  select(Date, NH4F, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+LoosinCreek_NH4_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(LoosinCreek_NH4_months) <- "Date"
+
+#Left joining to point out gaps
+LoosinCreek_NH4_timeseries_ready <- left_join(LoosinCreek_NH4_months, 
+                                               LoosinCreek_NH4_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in NH4
+LoosinCreek_NH4_timeseries_ready$NH4 = 
+  zoo::na.approx(LoosinCreek_NH4_timeseries_ready$NH4)
+
+#Creating time series for Loosin Creek's NH4
+LoosinCreek.NH4.monthly.ts <- ts(LoosinCreek_NH4_timeseries_ready$NH4, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+LoosinCreek.NH4.monthly.decomposed <- stl(LoosinCreek.NH4.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(LoosinCreek.NH4.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+LoosinCreek.NH4.monthly.trend <- 
+  Kendall::SeasonalMannKendall(LoosinCreek.NH4.monthly.ts)
+
+summary(LoosinCreek.NH4.monthly.trend)
+
+#subtracting seasonal component from our ts object
+LoosinCreek.NH4.monthly.nonseas <- (LoosinCreek.NH4.monthly.ts - 
+                                       LoosinCreek.NH4.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(LoosinCreek.NH4.monthly.nonseas)
+plot(LoosinCreek.NH4.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+LoosinCreek.NH4.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.NH4.monthly.nonseas)
+# Inspect results
+LoosinCreek.NH4.monthly.nonseas.trend
+```
+Decreasing trend, significant. 
+```{r}
+#NO3 - Loosin Creek
+LoosinCreek_NO3_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "Loosin Creek") %>% 
+  select(Date, NO3F, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+LoosinCreek_NO3_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(LoosinCreek_NO3_months) <- "Date"
+
+#Left joining to point out gaps
+LoosinCreek_NO3_timeseries_ready <- left_join(LoosinCreek_NO3_months, 
+                                               LoosinCreek_NO3_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in NO3
+LoosinCreek_NO3_timeseries_ready$NO3 = 
+  zoo::na.approx(LoosinCreek_NO3_timeseries_ready$NO3)
+
+#Creating time series for Loosin Creek's NO3
+LoosinCreek.NO3.monthly.ts <- ts(LoosinCreek_NO3_timeseries_ready$NO3, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+LoosinCreek.NO3.monthly.decomposed <- stl(LoosinCreek.NO3.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(LoosinCreek.NO3.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+LoosinCreek.NO3.monthly.trend <- 
+  Kendall::SeasonalMannKendall(LoosinCreek.NO3.monthly.ts)
+
+summary(LoosinCreek.NO3.monthly.trend)
+
+#subtracting seasonal component from our ts object
+LoosinCreek.NO3.monthly.nonseas <- (LoosinCreek.NO3.monthly.ts - 
+                                       LoosinCreek.NO3.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(LoosinCreek.NO3.monthly.nonseas)
+plot(LoosinCreek.NO3.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+LoosinCreek.NO3.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.NO3.monthly.nonseas)
+# Inspect results
+LoosinCreek.NO3.monthly.nonseas.trend
+```
+Seaonsal trend is significantly decreasing ? 
+```{r}
+#Temp - Loosin Creek
+LoosinCreek_Temp_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "Loosin Creek") %>% 
+  select(Date, Temp, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+LoosinCreek_Temp_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(LoosinCreek_Temp_months) <- "Date"
+
+#Left joining to point out gaps
+LoosinCreek_Temp_timeseries_ready <- left_join(LoosinCreek_Temp_months, 
+                                               LoosinCreek_Temp_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in Temp
+LoosinCreek_Temp_timeseries_ready$Temp = 
+  zoo::na.approx(LoosinCreek_Temp_timeseries_ready$Temp)
+
+#Creating time series for Loosin Creek's Temp
+LoosinCreek.Temp.monthly.ts <- ts(LoosinCreek_Temp_timeseries_ready$Temp, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+LoosinCreek.Temp.monthly.decomposed <- stl(LoosinCreek.Temp.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(LoosinCreek.Temp.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+LoosinCreek.Temp.monthly.trend <- 
+  Kendall::SeasonalMannKendall(LoosinCreek.Temp.monthly.ts)
+
+summary(LoosinCreek.Temp.monthly.trend)
+
+#subtracting seasonal component from our ts object
+LoosinCreek.Temp.monthly.nonseas <- (LoosinCreek.Temp.monthly.ts - 
+                                       LoosinCreek.Temp.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(LoosinCreek.Temp.monthly.nonseas)
+plot(LoosinCreek.Temp.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+LoosinCreek.Temp.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.Temp.monthly.nonseas)
+# Inspect results
+LoosinCreek.Temp.monthly.nonseas.trend
+```
+Significantly increasing. 
+
+For Loosin's Creek, NH4 showed a significant downward trend and temperature showed a significant upward trend.
+
+Next, let's do Research Creek. 
+```{r}
+#PO4 - Research Creek
+ResearchCreek_PO4_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "Research Creek") %>% 
+  select(Date, PO4F, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+ResearchCreek_PO4_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(ResearchCreek_PO4_months) <- "Date"
+
+#Left joining to point out gaps
+ResearchCreek_PO4_timeseries_ready <- left_join(ResearchCreek_PO4_months, 
+                                               ResearchCreek_PO4_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in PO4
+ResearchCreek_PO4_timeseries_ready$PO4 = 
+  zoo::na.approx(ResearchCreek_PO4_timeseries_ready$PO4)
+
+#Creating time series for Research Creek's PO4
+ResearchCreek.PO4.monthly.ts <- ts(ResearchCreek_PO4_timeseries_ready$PO4, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+ResearchCreek.PO4.monthly.decomposed <- stl(ResearchCreek.PO4.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(ResearchCreek.PO4.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+ResearchCreek.PO4.monthly.trend <- 
+  Kendall::SeasonalMannKendall(ResearchCreek.PO4.monthly.ts)
+
+summary(ResearchCreek.PO4.monthly.trend)
+
+#subtracting seasonal component from our ts object
+ResearchCreek.PO4.monthly.nonseas <- (ResearchCreek.PO4.monthly.ts - 
+                                       ResearchCreek.PO4.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(ResearchCreek.PO4.monthly.nonseas)
+plot(ResearchCreek.PO4.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+ResearchCreek.PO4.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.PO4.monthly.nonseas)
+# Inspect results
+ResearchCreek.PO4.monthly.nonseas.trend
+```
+Insignificant trend. 
+```{r}
+#NH4 - Research Creek
+ResearchCreek_NH4_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "Research Creek") %>% 
+  select(Date, NH4F, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+ResearchCreek_NH4_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(ResearchCreek_NH4_months) <- "Date"
+
+#Left joining to point out gaps
+ResearchCreek_NH4_timeseries_ready <- left_join(ResearchCreek_NH4_months, 
+                                               ResearchCreek_NH4_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in NH4
+ResearchCreek_NH4_timeseries_ready$NH4 = 
+  zoo::na.approx(ResearchCreek_NH4_timeseries_ready$NH4)
+
+#Creating time series for Research Creek's NH4
+ResearchCreek.NH4.monthly.ts <- ts(ResearchCreek_NH4_timeseries_ready$NH4, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+ResearchCreek.NH4.monthly.decomposed <- stl(ResearchCreek.NH4.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(ResearchCreek.NH4.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+ResearchCreek.NH4.monthly.trend <- 
+  Kendall::SeasonalMannKendall(ResearchCreek.NH4.monthly.ts)
+
+summary(ResearchCreek.NH4.monthly.trend)
+
+#subtracting seasonal component from our ts object
+ResearchCreek.NH4.monthly.nonseas <- (ResearchCreek.NH4.monthly.ts - 
+                                       ResearchCreek.NH4.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(ResearchCreek.NH4.monthly.nonseas)
+plot(ResearchCreek.NH4.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+ResearchCreek.NH4.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.NH4.monthly.nonseas)
+# Inspect results
+ResearchCreek.NH4.monthly.nonseas.trend
+```
+Significant downward trend. 
+```{r}
+#NO3 - Research Creek
+ResearchCreek_NO3_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "Research Creek") %>% 
+  select(Date, NO3F, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+ResearchCreek_NO3_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(ResearchCreek_NO3_months) <- "Date"
+
+#Left joining to point out gaps
+ResearchCreek_NO3_timeseries_ready <- left_join(ResearchCreek_NO3_months, 
+                                               ResearchCreek_NO3_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in NO3
+ResearchCreek_NO3_timeseries_ready$NO3 = 
+  zoo::na.approx(ResearchCreek_NO3_timeseries_ready$NO3)
+
+#Creating time series for Research Creek's NO3
+ResearchCreek.NO3.monthly.ts <- ts(ResearchCreek_NO3_timeseries_ready$NO3, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+ResearchCreek.NO3.monthly.decomposed <- stl(ResearchCreek.NO3.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(ResearchCreek.NO3.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+ResearchCreek.NO3.monthly.trend <- 
+  Kendall::SeasonalMannKendall(ResearchCreek.NO3.monthly.ts)
+
+summary(ResearchCreek.NO3.monthly.trend)
+
+#subtracting seasonal component from our ts object
+ResearchCreek.NO3.monthly.nonseas <- (ResearchCreek.NO3.monthly.ts - 
+                                       ResearchCreek.NO3.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(ResearchCreek.NO3.monthly.nonseas)
+plot(ResearchCreek.NO3.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+ResearchCreek.NO3.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.NO3.monthly.nonseas)
+# Inspect results
+ResearchCreek.NO3.monthly.nonseas.trend
+```
+Significant postive trend ? 
+```{r}
+#Temp - Research Creek
+ResearchCreek_Temp_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "Research Creek") %>% 
+  select(Date, Temp, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+ResearchCreek_Temp_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(ResearchCreek_Temp_months) <- "Date"
+
+#Left joining to point out gaps
+ResearchCreek_Temp_timeseries_ready <- left_join(ResearchCreek_Temp_months, 
+                                               ResearchCreek_Temp_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in Temp
+ResearchCreek_Temp_timeseries_ready$Temp = 
+  zoo::na.approx(ResearchCreek_Temp_timeseries_ready$Temp)
+
+#Creating time series for Research Creek's Temp
+ResearchCreek.Temp.monthly.ts <- ts(ResearchCreek_Temp_timeseries_ready$Temp, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+ResearchCreek.Temp.monthly.decomposed <- stl(ResearchCreek.Temp.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(ResearchCreek.Temp.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+ResearchCreek.Temp.monthly.trend <- 
+  Kendall::SeasonalMannKendall(ResearchCreek.Temp.monthly.ts)
+
+summary(ResearchCreek.Temp.monthly.trend)
+
+#subtracting seasonal component from our ts object
+ResearchCreek.Temp.monthly.nonseas <- (ResearchCreek.Temp.monthly.ts - 
+                                       ResearchCreek.Temp.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(ResearchCreek.Temp.monthly.nonseas)
+plot(ResearchCreek.Temp.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+ResearchCreek.Temp.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.Temp.monthly.nonseas)
+# Inspect results
+ResearchCreek.Temp.monthly.nonseas.trend
+```
+Seems like there is an outlier in the temperature data (most likley some kind of error). 
+
+For Research Creek, NH4 had a significant downward trend and NO3 had a significant postive trend ? 
+
+Lastly, we will do Zeke's Basin. 
+```{r}
+#PO4 - Zeke's Basin
+ZekeBasin_PO4_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "Zeke's Basin") %>% 
+  select(Date, PO4F, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+ZekeBasin_PO4_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(ZekeBasin_PO4_months) <- "Date"
+
+#Left joining to point out gaps
+ZekeBasin_PO4_timeseries_ready <- left_join(ZekeBasin_PO4_months, 
+                                               ZekeBasin_PO4_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in PO4
+ZekeBasin_PO4_timeseries_ready$PO4 = 
+  zoo::na.approx(ZekeBasin_PO4_timeseries_ready$PO4)
+
+#Creating time series for Research Creek's PO4
+ZekeBasin.PO4.monthly.ts <- ts(ZekeBasin_PO4_timeseries_ready$PO4, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+ZekeBasin.PO4.monthly.decomposed <- stl(ZekeBasin.PO4.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(ZekeBasin.PO4.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+ZekeBasin.PO4.monthly.trend <- 
+  Kendall::SeasonalMannKendall(ZekeBasin.PO4.monthly.ts)
+
+summary(ZekeBasin.PO4.monthly.trend)
+
+#subtracting seasonal component from our ts object
+ZekeBasin.PO4.monthly.nonseas <- (ZekeBasin.PO4.monthly.ts - 
+                                       ZekeBasin.PO4.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(ZekeBasin.PO4.monthly.nonseas)
+plot(ZekeBasin.PO4.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+ZekeBasin.PO4.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.PO4.monthly.nonseas)
+# Inspect results
+ZekeBasin.PO4.monthly.nonseas.trend
+```
+Insignificant trend. 
+```{r}
+#NH4 - Zeke's Basin
+ZekeBasin_NH4_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "Zeke's Basin") %>% 
+  select(Date, NH4F, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+ZekeBasin_NH4_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(ZekeBasin_NH4_months) <- "Date"
+
+#Left joining to point out gaps
+ZekeBasin_NH4_timeseries_ready <- left_join(ZekeBasin_NH4_months, 
+                                               ZekeBasin_NH4_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in PO4
+ZekeBasin_NH4_timeseries_ready$NH4 = 
+  zoo::na.approx(ZekeBasin_NH4_timeseries_ready$NH4)
+
+#Creating time series for Research Creek's PO4
+ZekeBasin.NH4.monthly.ts <- ts(ZekeBasin_NH4_timeseries_ready$NH4, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+ZekeBasin.NH4.monthly.decomposed <- stl(ZekeBasin.NH4.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(ZekeBasin.NH4.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+ZekeBasin.NH4.monthly.trend <- 
+  Kendall::SeasonalMannKendall(ZekeBasin.NH4.monthly.ts)
+
+summary(ZekeBasin.NH4.monthly.trend)
+
+#subtracting seasonal component from our ts object
+ZekeBasin.NH4.monthly.nonseas <- (ZekeBasin.NH4.monthly.ts - 
+                                       ZekeBasin.NH4.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(ZekeBasin.NH4.monthly.nonseas)
+plot(ZekeBasin.NH4.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+ZekeBasin.NH4.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.NH4.monthly.nonseas)
+# Inspect results
+ZekeBasin.NH4.monthly.nonseas.trend
+```
+Significant downward trend. 
+```{r}
+#NO3 - Zeke's Basin
+ZekeBasin_NO3_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "Zeke's Basin") %>% 
+  select(Date, NO3F, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+ZekeBasin_NO3_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(ZekeBasin_NO3_months) <- "Date"
+
+#Left joining to point out gaps
+ZekeBasin_NO3_timeseries_ready <- left_join(ZekeBasin_NO3_months, 
+                                               ZekeBasin_NO3_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in NO3
+ZekeBasin_NO3_timeseries_ready$NO3 = 
+  zoo::na.approx(ZekeBasin_NO3_timeseries_ready$NO3)
+
+#Creating time series for Research Creek's NO3
+ZekeBasin.NO3.monthly.ts <- ts(ZekeBasin_NO3_timeseries_ready$NO3, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+ZekeBasin.NO3.monthly.decomposed <- stl(ZekeBasin.NO3.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(ZekeBasin.NO3.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+ZekeBasin.NO3.monthly.trend <- 
+  Kendall::SeasonalMannKendall(ZekeBasin.NO3.monthly.ts)
+
+summary(ZekeBasin.NO3.monthly.trend)
+
+#subtracting seasonal component from our ts object
+ZekeBasin.NO3.monthly.nonseas <- (ZekeBasin.NO3.monthly.ts - 
+                                       ZekeBasin.NO3.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(ZekeBasin.NO3.monthly.nonseas)
+plot(ZekeBasin.NO3.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+ZekeBasin.NO3.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.NO3.monthly.nonseas)
+# Inspect results
+ZekeBasin.NO3.monthly.nonseas.trend
+```
+Insignificant trend. 
+```{r}
+#Temp - Zeke's Basin
+ZekeBasin_Temp_monthly <- stations_wq_nutr_cleaned %>%
+  filter(StationName == "Zeke's Basin") %>% 
+  select(Date, Temp, Year, Month) %>% 
+  filter(Date > as.Date("2002-03-01")) %>% 
+  filter(Date < as.Date("2025-01-01"))
+
+#Finding gaps by making new data frame
+ZekeBasin_Temp_months <- as.data.frame(seq.Date(from=as.Date("2002/04/01"),
+                                 to=as.Date("2024/12/01"),
+                                 by="month"))
+colnames(ZekeBasin_Temp_months) <- "Date"
+
+#Left joining to point out gaps
+ZekeBasin_Temp_timeseries_ready <- left_join(ZekeBasin_Temp_months, 
+                                               ZekeBasin_Temp_monthly, 
+                                               by = "Date")
+
+#Using linear interpolation to fill in Temp
+ZekeBasin_Temp_timeseries_ready$Temp = 
+  zoo::na.approx(ZekeBasin_Temp_timeseries_ready$Temp)
+
+#Creating time series for Research Creek's Temp
+ZekeBasin.Temp.monthly.ts <- ts(ZekeBasin_Temp_timeseries_ready$Temp, 
+                                  frequency = 12, start = c(2002,3))
+
+#Decomposing
+ZekeBasin.Temp.monthly.decomposed <- stl(ZekeBasin.Temp.monthly.ts, 
+                                           s.window = "periodic")
+
+#plotting
+plot(ZekeBasin.Temp.monthly.decomposed)
+
+#Running monotonic trend analysis to inspect seasonality
+ZekeBasin.Temp.monthly.trend <- 
+  Kendall::SeasonalMannKendall(ZekeBasin.Temp.monthly.ts)
+
+summary(ZekeBasin.Temp.monthly.trend)
+
+#subtracting seasonal component from our ts object
+ZekeBasin.Temp.monthly.nonseas <- (ZekeBasin.Temp.monthly.ts - 
+                                       ZekeBasin.Temp.monthly.decomposed$time.series[,1])
+
+#making sure it worked
+plot(ZekeBasin.Temp.monthly.nonseas)
+plot(ZekeBasin.Temp.monthly.ts)
+
+# Running Mann Kendall on non-seasonal monthly series
+ZekeBasin.Temp.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.Temp.monthly.nonseas)
+# Inspect results
+ZekeBasin.Temp.monthly.nonseas.trend
+```
+Significant upward trend. 
+
+For Zeke's Basin, NH4 had a significant downward trend and temperature had a significant upward trend. 
+
+
+
 
 ## Summary and Conclusion
 
