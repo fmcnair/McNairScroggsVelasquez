@@ -1,15 +1,16 @@
 ---
 title: "Final Project"
-subtitle: "ENVIRON 872"
+subtitle: ENVIRON 872
 author: "Flannery McNair, Andi Scroggs, and Alonso Valasquez"
 date: "2025-12-05"
-output: html_document
-toc: TRUE
-lof: TRUE
+output:
+  pdf_document: default
+  html_document:
+    toc: true
+    lof: true
 ---
 
-```{r setup, include=FALSE, message=FALSE, warning=FALSE, include=FALSE}
-
+```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
 library(here)
 library(lubridate)
 library(tidyverse)
@@ -18,6 +19,7 @@ library(dplyr)
 library(cowplot)
 library(corrplot)
 library(GGally)
+library(knitr)
 #install.packages("trend")
 library(trend)
 #install.packages("zoo")
@@ -26,11 +28,24 @@ library(zoo)
 library(Kendall)
 #install.packages("tseries")
 library(tseries)
-
 here()
 ```
 
+\newpage
 
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=8, out.width="30%"}
+par(mfror = c(2, 2), 
+    mar = c(2, 2, 2, 2))
+
+knitr::include_graphics("NOCZB.png")
+knitr::include_graphics("NOCRC.png")
+knitr::include_graphics("NOCLC.png")
+knitr::include_graphics("NOCEC.png")
+
+par(mfrow = c(1, 1))
+```
+
+\newpage
 
 ## Rationale and Research Question
 
@@ -39,6 +54,8 @@ here()
 
 ## Dataset Information
 
+The data set was collected through the National Estuarine Research Reserve System's (NERR) National Monitoring Program. NERR was established by the Coastal Zone Management Act and was in paid partnership with National Oceanic and Atmospheric Administration. The data set is public information and meets the quality assurance and quality control protocols of the Estuarine Reserve Division.
+We collected the data from the National Estuarine Research Reserve System's Centralized Data Management Office. Specifically, we collected nutrient and water quality data from four stations in North Carolina: East Cribbing, Loosin Creek, Research Creek, and Zeke's Basin. 
 
 \newpage
 
@@ -91,25 +108,27 @@ noczb_water_quality <- noczbwq %>%
 
 ## Data Wrangling
 
-After the conclusion of exploring the raw data, we began to wrangle the data by choosing the variables we wished to keep for our study. For the nutrient data sets we kept:
-* Station Code
-* Date and Time
-* Orthophosphate (PO4F) (mg/L) 
-* Ammonnium Fluoride (NH4F) (mg/L) 
-* Nitryl Fluoride (NO2F) (mg/L) 
-* Fluorine Nitrate (NO3F) (mg/L) 
-* Nitrate + Nitrate (NO23F) (mg/L)
-* Chlorophyll (ug/L)
+After the conclusion of exploring the raw data, we began to wrangle the data by choosing the variables we wished to keep for our study. 
+For the nutrient data sets we kept:
+- Station Code
+- Date and Time
+- Orthophosphate (PO4F) (mg/L) 
+- Ammonnium Fluoride (NH4F) (mg/L) 
+- Nitryl Fluoride (NO2F) (mg/L) 
+- Fluorine Nitrate (NO3F) (mg/L) 
+- Nitrate + Nitrate (NO23F) (mg/L)
+- Chlorophyll (ug/L)
+
 For the water quality data sets we kept the variables:  
-* Station Code
-* Date and Time
-* Temperature (degrees Celsius)
-* Salinity (ppt)
-* Dissolved Oxygen (%)
-* Dissolved Oxygen in milligrams per Liter (mg/L)
-* Depth (m)
-* pH (standard units)
-* Turbidity (NTU)
+- Station Code
+- Date and Time
+- Temperature (degrees Celsius)
+- Salinity (ppt)
+- Dissolved Oxygen (%)
+- Dissolved Oxygen in milligrams per Liter (mg/L)
+- Depth (m)
+- pH (standard units)
+- Turbidity (NTU)
 
  
 ```{r first cleaning/choosing the columns, message=FALSE, warning=FALSE, include=FALSE}
@@ -180,7 +199,7 @@ water_quality <- water_quality %>%
   mutate(Date = as.Date(DateTimeStamp))
 ```
 
-```{r clean Sampling Station dataset, echo=FALSE, message=FALSE, warning=FALSE}
+```{r clean Sampling Station dataset, message=FALSE, warning=FALSE, include=FALSE}
 # Sampling Stations
 # rename the  columns bc they have spaces
 sampling_stations <- sampling_stations %>%
@@ -201,7 +220,7 @@ sampling_stations_cleaned <- sampling_stations_cleaned %>%
 str(sampling_stations_cleaned)
 ```
 
-```{r clean up formatting of StationCodes}
+```{r clean up formatting of StationCodes, include=FALSE}
 # Clean up spaces and formatting differences
 nutrients$StationCode <- trimws(nutrients$StationCode)
 water_quality$StationCode <- trimws(water_quality$StationCode)
@@ -260,8 +279,6 @@ water_quality_monthlyavg <- water_quality %>%
             Turb = mean(Turb, na.rm = TRUE))
 ```
 
-After cleaning, preparing, and combining all of the files into one data set for nutrients and one data set for water quality, we added the sampling station data to each. This allowed us to create two large data sets which we will use for our study.
-
 ```{r add station names to nutrient and water quality data, message=FALSE, warning=FALSE, include=FALSE}
 #joining station names to nutrients
 nutrients_stations_dailyavg <- 
@@ -278,7 +295,7 @@ water_quality_stations <-
   left_join(water_quality_monthlyavg, sampling_stations_cleaned, by = "StationCode")
 ```
 
-```{r}
+```{r date column, message=FALSE, warning=FALSE, include=FALSE}
 #creating a proper date column for time series analysis
 water_quality_stations <- water_quality_stations %>% 
   mutate(Date = ym(paste(Year, Month)))
@@ -286,7 +303,7 @@ nutrients_stations_monthlyavg <- nutrients_stations_monthlyavg %>%
   mutate(Date = ym(paste(Year,Month)))
 ```
 
-```{r}
+```{r merging datasets, message=FALSE, warning=FALSE, include=FALSE}
 #merging the two datasets to make one monstrous master dataset
 merged_test <- full_join(water_quality_stations, nutrients_stations_monthlyavg,
                     by = c("StationName", "Date"),
@@ -319,9 +336,9 @@ stations_wq_nutr_cleaned <- merged_test %>%
   arrange(StationName, Date)
 ```
 
+```{r wirte new csv files, message=FALSE, warning=FALSE, include=FALSE}
+# Now we want to save this final cleaned data set and make sure it's pushed to our repository in Github!
 
-Now we want to save this final cleaned data set and make sure it's pushed to our repository in Github!
-```{r}
 write.csv(water_quality_stations, row.names = FALSE, file =
             "./Data/water_quality_stations_monthlyavg_cleaned")
 write.csv(nutrients_stations_monthlyavg, row.names = FALSE, file =
@@ -330,12 +347,13 @@ write.csv(stations_wq_nutr_cleaned, row.names = FALSE, file =
             "./Data/stations_wq_nutr_cleaned")
 ```
 
+After cleaning, preparing, and combining all of the files into one data set for nutrients and one data set for water quality, we added the sampling station data to each. This allowed us to create two large data sets which we will use for our study. With so multiple samples taken per day, we decided to get a monthly average of the data since our study focuses on the changes in nutrients and water quality over a 12 year period (2002-2024). Finally, we saved our new completed datasets as new csv files to ensure they were saved properly and could be used in future studies if need be.
 
 \newpage
 
 ## Exploration of Processed Data
 
-```{r}
+```{r theme, message=FALSE, warning=FALSE}
 #Setting our theme, a lovely light toothpaste seafoam green to match a eutrophication aesthetic?
 our_theme <- theme_classic(base_size = 14, base_family = "serif") +
   theme(plot.title = element_text(color = '#4F4F4F'),
@@ -355,28 +373,27 @@ our_theme <- theme_classic(base_size = 14, base_family = "serif") +
 ```
 
 Building Correlation Matrix
-```{r}
+```{r correlation matrix, message=FALSE, warning=FALSE, include=FALSE}
 num_data <- stations_wq_nutr_cleaned[, c("Temp", "DO_mgl", "Depth",
                                          "pH", "PO4F", "NH4F", "NO3F",
                                          "CHLA_N", "Month")]
 cor_matrix <- cor(num_data, use = "pairwise.complete.obs", method = "pearson")
-
 ```
 
 ggpairs
-```{r, warning=FALSE}
+```{r fig.cap="ggpairs", message=FALSE, warning=FALSE}
 ggpairs(num_data)
 ```
 
 corrplot, something more readable than ggpairs
-```{r}
+```{r fig.cap="Corrplot", message=FALSE, warning=FALSE}
 corrplot(cor_matrix, method = "color", type = "upper",
          tl.col = "black", tl.srt = 45)
 ```
 
 
 We're most interested in Dissolved Oxygen across the different monitoring stations. Is there consistent data for us to analyze? Could we identify trends over time?
-```{r}
+```{r fig.cap="Dissolved oxygen over time for each station", message=FALSE, warning=FALSE}
 #looking at dissolved oxygen over time for each station
 stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = Date, y = DO_mgl, color = StationName)) +
@@ -387,8 +404,8 @@ stations_wq_nutr_cleaned %>%
   our_theme
 ```
 
-Although plotting DO is helpful for seeing consistent patterns and concentrations across all four stations, let's look at them separately to see gaps and data coverage.
-```{r}
+Although plotting dissolved oxygen is helpful for seeing consistent patterns and concentrations across all four stations, let's look at them separately to see gaps and data coverage.
+```{r fig.cap="Plotting dissolved oxygen over time for each monitoring station separately", echo=FALSE, message=FALSE, warning=FALSE}
 #Using facets to plot DO separately for each monitoring station
 stations_wq_nutr_cleaned %>%
   ggplot(mapping = aes(x=Date, y=DO_mgl)) +
@@ -402,7 +419,7 @@ stations_wq_nutr_cleaned %>%
 East Cribbing's data seems to end by 2022. This is good to know for our analysis.
 
 It seems that there's variation in dissolved oxygen across the year. What do the monthly spreads look like?
-```{r}
+```{r fig.cap="Dissolved oxygen monthly averages at each monitoring station", echo=FALSE, message=FALSE, warning=FALSE}
 #looking at monthly averages
 stations_wq_nutr_cleaned %>%
   ggplot(aes(x = factor(Month,levels=1:12,labels=month.abb), y = DO_mgl, color = StationName)) +
@@ -413,8 +430,8 @@ stations_wq_nutr_cleaned %>%
   our_theme
 ```
 
-What's the relationship between temperature and dissolved oxygen?
-```{r}
+###### What's the relationship between temperature and dissolved oxygen?
+```{r fig.cap="Relationship between temperature and dissolved oxygen", echo=FALSE, message=FALSE, warning=FALSE}
 Temp_x_limits <- c(0, 35)
 
 Temp_DO_combined <- stations_wq_nutr_cleaned %>% 
@@ -452,8 +469,8 @@ plot_grid(
 ```
 
 
-What's the relationship between nitrate and dissolved oxygen?
-```{r}
+###### What's the relationship between nitrate and dissolved oxygen?
+```{r fig.cap="Relationship between nitrate and dissolved oxygen", echo=FALSE, message=FALSE, warning=FALSE}
 NO3F_DO_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = NO3F, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
@@ -486,8 +503,8 @@ plot_grid(
 )
 ```
 
-What's the relationship between phosphate and dissolved oxygen?
-```{r}
+###### What's the relationship between phosphate and dissolved oxygen?
+```{r fig.cap="Relationship between phosphate and dissolved oxygen", echo=FALSE, message=FALSE, warning=FALSE}
 PO4F_x_limits <- c(-0.001, 0.15)
 
 PO4F_DO_combined <- stations_wq_nutr_cleaned %>% 
@@ -519,8 +536,8 @@ plot_grid(
 )
 ```
 
-Ammonium?
-```{r}
+###### What is the relationship between ammonium and dissolved oxygen?
+```{r fig.cap="Relationship between Ammonium and dissolved oxygen", echo=FALSE, message=FALSE, warning=FALSE}
 NH4F_x_limits <- c(-0.01, 0.5)
 
 NH4F_DO_combined <- stations_wq_nutr_cleaned %>% 
@@ -557,10 +574,8 @@ plot_grid(
 )
 ```
 
-
-Depth
-What's the relationship between temperature and dissolved oxygen?
-```{r}
+###### What's the relationship between depth and dissolved oxygen?
+```{r fig.cap="Relationship between depth and dissolved oxygen", echo=FALSE, message=FALSE, warning=FALSE}
 Depth_DO_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = Depth, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
@@ -593,9 +608,9 @@ plot_grid(
 )
 ```
 
-We are also interested in Chlorophyll, as it can indicate algal blooms.
+###### We are also interested in Chlorophyll, as it can indicate algal blooms.
 
-```{r}
+```{r fig.cap="Chlorophyll concentrations from 2002-2024", echo=FALSE, message=FALSE, warning=FALSE}
 #looking at chlorophyll over time for each station
 stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = Date, y = CHLA_N, color = StationName)) +
@@ -606,8 +621,8 @@ stations_wq_nutr_cleaned %>%
   our_theme
 ```
 
-Although plotting Chlorophyll is helpful for seeing consistent patterns and concentrations across all four stations, let's look at them separately to see gaps and data coverage.
-```{r}
+
+```{r fig.cap="Chlorophyll concentrations from 2002-2024 for each monitoring station", echo=FALSE, message=FALSE, warning=FALSE}
 #Using facets to plot chlorophyll separately for each monitoring station
 stations_wq_nutr_cleaned %>%
   ggplot(mapping = aes(x=Date, y=CHLA_N)) +
@@ -619,10 +634,11 @@ stations_wq_nutr_cleaned %>%
   scale_y_continuous(limits = c(0,75)) +
   our_theme
 ```
+Although plotting Chlorophyll is helpful for seeing consistent patterns and concentrations across all four stations, let's look at them separately to see gaps and data coverage.
 Loosin Creek and Research Creek seem to have less fluctuation in their Chlorophyll than East Cribbbing and Zeke's Basin. Could it do with differences in depth or other variables?
 
 It seems that there's variation in chlorophyll across the year. What do the monthly spreads look like?
-```{r}
+```{r fig.cap="Chlorophyll monthly concentrations", echo=FALSE, message=FALSE, warning=FALSE}
 #looking at monthly averages
 stations_wq_nutr_cleaned %>%
   ggplot(aes(x = factor(Month,levels=1:12,labels=month.abb), y = CHLA_N, color = StationName)) +
@@ -634,8 +650,8 @@ stations_wq_nutr_cleaned %>%
   our_theme
 ```
 
-What's the relationship between temperature and chlorophpyll?
-```{r}
+###### What's the relationship between temperature and chlorophyll?
+```{r fig.cap="Relationship between temperature and chlorophyll", echo=FALSE, message=FALSE, warning=FALSE}
 #Looking at temperature vs dissolved oxygen with trend line
 Temp_x_limits <- c(0, 35)
 CHLA_N_y_limits <- c(0,75)
@@ -676,8 +692,8 @@ plot_grid(
 )
 ```
 
-What's the relationship between nitrate and dissolved oxygen?
-```{r}
+###### What's the relationship between nitrate and chlorophyll?
+```{r fig.cap="Relationship between nitrate and chlorophyll", echo=FALSE, message=FALSE, warning=FALSE}
 #Looking at nitrate vs chlorophyll with trend line
 CHLA_N_y_limits <- c(0,75)
 
@@ -715,8 +731,8 @@ plot_grid(
 )
 ```
 
-What's the relationship between phosphate and dissolved oxygen?
-```{r}
+###### What's the relationship between phosphate and chlorophyll?
+```{r fig.cap="Relationship between phosphate and chlorophyll", echo=FALSE, message=FALSE, warning=FALSE}
 #looking at phosphate vs chlorophyll with trend line
 PO4F_x_limits <- c(-0.001, 0.15)
 CHLA_N_y_limits <- c(0,75)
@@ -757,8 +773,8 @@ plot_grid(
 )
 ```
 
-Ammonium?
-```{r}
+###### What's the relationship between ammonium and chlorophyll?
+```{r fig.cap="Relationship between ammonium and chlorophyll", echo=FALSE, message=FALSE, warning=FALSE}
 #Looking at ammonium vs chlorophyll with trend line
 NH4F_x_limits <- c(-0.01, 0.5)
 CHLA_N_y_limits <- c(0,75)
@@ -799,8 +815,8 @@ plot_grid(
 )
 ```
 
-Depth
-```{r}
+###### What's the relationship between depth and chlorophyll?
+```{r fig.cap="Relationship between depth and chlorophyll", echo=FALSE, message=FALSE, warning=FALSE}
 #Looking at depth vs chlorophyll with trend line
 CHLA_N_y_limits <- c(0,75)
 
@@ -838,8 +854,8 @@ plot_grid(
 )
 ```
 
-Now, what does the relationship between dissolved oxygen and chlorophyll look like?
-```{r}
+###### Now, what does the relationship between dissolved oxygen and chlorophyll look like?
+```{r fig.cap="Relationship between dissolved oxygen and chlorophyll", echo=FALSE, message=FALSE, warning=FALSE}
 #Looking at dissolved oxygen vs chlorophyll with trend line
 CHLA_N_x_limits <- c(0,75)
 
@@ -877,7 +893,6 @@ plot_grid(
 )
 ```
 
-
 \newpage
 
 ## Analysis
@@ -885,8 +900,8 @@ We want to do two main things: 1) Identify if there is a trend in decreasing dis
 
 First, we must turn dissolved oxygen into a time series across each station.
 
-Let's start with East Cribbing.
-```{r}
+###### East Cribbing.
+```{r fig.cap="Time series of dissolved oxygen at the East Cribbing monitoring station", message=FALSE, warning=FALSE}
 #selecting just East Cribbing's DO data and filtering out years with no data
 EastCribbing_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "East Cribbing") %>% 
@@ -936,8 +951,8 @@ EastCribbingDO.monthly.nonseas.trend <- trend::mk.test(EastCribbingDO.monthly.no
 EastCribbingDO.monthly.nonseas.trend
 ```
 
-now lets do Loosin Creek
-```{r}
+###### Loosin Creek
+```{r fig.cap="Time series of dissolved oxygen at the Loosin Creek monitoring station", echo=FALSE, message=FALSE, warning=FALSE}
 #selecting just Loosin Creek's DO data and filtering out years with no data
 LoosinCreek_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Loosin Creek") %>% 
@@ -986,8 +1001,8 @@ LoosinCreekDO.monthly.nonseas.trend <- trend::mk.test(LoosinCreekDO.monthly.nons
 LoosinCreekDO.monthly.nonseas.trend
 ```
 
-Now Research Creek
-```{r}
+###### Research Creek
+```{r fig.cap="Time series of dissolved oxygen at the Research Creek monitoring station", echo=FALSE, message=FALSE, warning=FALSE}
 #selecting just Research Creek's DO data and filtering out years with no data
 ResearchCreek_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Research Creek") %>% 
@@ -1036,8 +1051,8 @@ ResearchCreekDO.monthly.nonseas.trend <- trend::mk.test(ResearchCreekDO.monthly.
 ResearchCreekDO.monthly.nonseas.trend
 ```
 
-Lastly, Zeke's Basin
-```{r}
+##### Zeke's Basin
+```{r fig.cap="Time series of dissolved oxygen at the Zeke's Basin monitoring station", echo=FALSE, message=FALSE, warning=FALSE}
 #selecting just Research Creek's DO data and filtering out years with no data
 ZekesBasin_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Zeke's Basin") %>% 
@@ -1088,9 +1103,10 @@ ZekesBasinDO.monthly.nonseas.trend
 ```
 All Monitoring Stations have had statistically significant trends in their Dissolved Oxygen.
 
-What about chlorophyll?
-Let's start with East Cribbing.
-```{r}
+Next, we want to see how chlorophyll concentrations change over time at each station. 
+
+###### East Cribbing.
+```{r fig.cap="Time series of chlorophyll at the East Cribbing monitoring station", echo=FALSE, message=FALSE, warning=FALSE}
 #selecting just East Cribbing's CHLA data and filtering out years with no data
 EastCribbing_CHLA_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "East Cribbing") %>% 
@@ -1138,8 +1154,8 @@ EastCribbingCHLA.monthly.nonseas.trend <- trend::mk.test(EastCribbingCHLA.monthl
 EastCribbingCHLA.monthly.nonseas.trend
 ```
 
-now lets do Loosin Creek
-```{r}
+###### Loosin Creek
+```{r fig.cap="Time series of chlorophyll at the Loosin Crreek monitoring station", echo=FALSE, message=FALSE, warning=FALSE}
 #selecting just Loosin Creek's CHLA data and filtering out years with no data
 LoosinCreek_CHLA_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Loosin Creek") %>% 
@@ -1187,8 +1203,8 @@ LoosinCreekCHLA.monthly.nonseas.trend <- trend::mk.test(LoosinCreekCHLA.monthly.
 LoosinCreekCHLA.monthly.nonseas.trend
 ```
 
-Now Research Creek
-```{r}
+###### Research Creek
+```{r fig.cap="Time series of chlorophyll at the Research Creek monitoring station", echo=FALSE, message=FALSE, warning=FALSE}
 #selecting just Research Creek's CHLA data and filtering out years with no data
 ResearchCreek_CHLA_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Research Creek") %>% 
@@ -1237,8 +1253,8 @@ ResearchCreekCHLA.monthly.nonseas.trend <- trend::mk.test(ResearchCreekCHLA.mont
 ResearchCreekCHLA.monthly.nonseas.trend
 ```
 
-Lastly, Zeke's Basin
-```{r}
+###### Zeke's Basin
+```{r fig.cap="Time series of chlorophyll at Zeke's Basin monitoring station", echo=FALSE, message=FALSE, warning=FALSE}
 #selecting just Zeke's Basin's CHLA data and filtering out years with no data
 ZekeBasin_CHLA_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Zeke's Basin") %>% 
@@ -1288,7 +1304,7 @@ ZekeBasinCHLA.monthly.nonseas.trend
 ```
 All of the stations have statistically significant trends in their DO and Chlorophyll levels. So now we ask, which variables are most responsible for these changes?  
 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #DO
 stations_wo_na <- stations_wq_nutr_cleaned[complete.cases(
   stations_wq_nutr_cleaned[, c("DO_mgl","Temp","PO4F","NH4F","NO3F", "CHLA_N")]), ]
@@ -1315,7 +1331,7 @@ Temperature is the most impactful variable in both of the models, with PO4 being
 From here, we perform time series analyses on these variables to determine if their trends are in line with what we expect. 
 
 Here are the variables for East Cribbing. 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #PO4 - East Cribbing
 EastCribbing_PO4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "East Cribbing") %>% 
@@ -1369,7 +1385,7 @@ EastCribbing.PO4.monthly.nonseas.trend <- trend::mk.test(EastCribbing.PO4.monthl
 EastCribbing.PO4.monthly.nonseas.trend
 ```
 Increasing trend of PO4, significant. 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #NH4 - East Cribbing
 EastCribbing_NH4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "East Cribbing") %>% 
@@ -1423,7 +1439,7 @@ EastCribbing.NH4.monthly.nonseas.trend <- trend::mk.test(EastCribbing.NH4.monthl
 EastCribbing.NH4.monthly.nonseas.trend
 ```
 Decreasing trend of NH4, significant. 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #NO3 - East Cribbing
 EastCribbing_NO3_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "East Cribbing") %>% 
@@ -1477,7 +1493,7 @@ EastCribbing.NO3.monthly.nonseas.trend <- trend::mk.test(EastCribbing.NO3.monthl
 EastCribbing.NO3.monthly.nonseas.trend
 ```
 Insignificant trend. 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #Temp - East Cribbing
 EastCribbing_Temp_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "East Cribbing") %>% 
@@ -1535,7 +1551,7 @@ Insignificant trend.
 For East Cribbing, PO4 had a significant increasing trend and NH4 has a significant decreasing trend. 
 
 Now let's do Loosin Creek. 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #PO4 - Loosin Creek
 LoosinCreek_PO4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Loosin Creek") %>% 
@@ -1589,7 +1605,7 @@ LoosinCreek.PO4.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.PO4.monthly.
 LoosinCreek.PO4.monthly.nonseas.trend
 ```
 Non seasonal trend is significantly decreasing. 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #NH4 - Loosin Creek
 LoosinCreek_NH4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Loosin Creek") %>% 
@@ -1643,7 +1659,7 @@ LoosinCreek.NH4.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.NH4.monthly.
 LoosinCreek.NH4.monthly.nonseas.trend
 ```
 Decreasing trend, significant. 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #NO3 - Loosin Creek
 LoosinCreek_NO3_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Loosin Creek") %>% 
@@ -1697,7 +1713,7 @@ LoosinCreek.NO3.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.NO3.monthly.
 LoosinCreek.NO3.monthly.nonseas.trend
 ```
 Seaonsal trend is significantly decreasing ? 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #Temp - Loosin Creek
 LoosinCreek_Temp_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Loosin Creek") %>% 
@@ -1755,7 +1771,7 @@ Significantly increasing.
 For Loosin's Creek, NH4 showed a significant downward trend and temperature showed a significant upward trend.
 
 Next, let's do Research Creek. 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #PO4 - Research Creek
 ResearchCreek_PO4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Research Creek") %>% 
@@ -1809,7 +1825,7 @@ ResearchCreek.PO4.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.PO4.mont
 ResearchCreek.PO4.monthly.nonseas.trend
 ```
 Insignificant trend. 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #NH4 - Research Creek
 ResearchCreek_NH4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Research Creek") %>% 
@@ -1863,7 +1879,7 @@ ResearchCreek.NH4.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.NH4.mont
 ResearchCreek.NH4.monthly.nonseas.trend
 ```
 Significant downward trend. 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #NO3 - Research Creek
 ResearchCreek_NO3_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Research Creek") %>% 
@@ -1917,7 +1933,7 @@ ResearchCreek.NO3.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.NO3.mont
 ResearchCreek.NO3.monthly.nonseas.trend
 ```
 Significant postive trend ? 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #Temp - Research Creek
 ResearchCreek_Temp_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Research Creek") %>% 
@@ -1975,7 +1991,7 @@ Seems like there is an outlier in the temperature data (most likley some kind of
 For Research Creek, NH4 had a significant downward trend and NO3 had a significant postive trend ? 
 
 Lastly, we will do Zeke's Basin. 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #PO4 - Zeke's Basin
 ZekeBasin_PO4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Zeke's Basin") %>% 
@@ -2029,7 +2045,7 @@ ZekeBasin.PO4.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.PO4.monthly.nons
 ZekeBasin.PO4.monthly.nonseas.trend
 ```
 Insignificant trend. 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #NH4 - Zeke's Basin
 ZekeBasin_NH4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Zeke's Basin") %>% 
@@ -2083,7 +2099,7 @@ ZekeBasin.NH4.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.NH4.monthly.nons
 ZekeBasin.NH4.monthly.nonseas.trend
 ```
 Significant downward trend. 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #NO3 - Zeke's Basin
 ZekeBasin_NO3_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Zeke's Basin") %>% 
@@ -2137,7 +2153,7 @@ ZekeBasin.NO3.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.NO3.monthly.nons
 ZekeBasin.NO3.monthly.nonseas.trend
 ```
 Insignificant trend. 
-```{r}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 #Temp - Zeke's Basin
 ZekeBasin_Temp_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Zeke's Basin") %>% 
