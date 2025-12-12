@@ -43,6 +43,14 @@ knitr::include_graphics(c("NOCEC.png",
 
 # 1. Rationale and Research Question
 
+  Human development and global environmental change have put strain on aquatic ecosystems world wide. One of the biggest impacts on coastal estuarine systems is the rise in frequency of eutrophication, when excess nutrients cause phytoplankton populations to soar. When nutrients like phosphorus and nitrogen are moved through waterways and accumulate at the mouths of streams and rivers, algal blooms cause foul odors, block light, and remove dissolved oxygen in the water as the large numbers of phytoplankton die (Chislock et al., 2013). 
+  The National Atmospheric and Oceanic Association has 4 water quality and nutrients monitoring stations in southern North Carolina as part of its water monitoring open data portal. Components of the North Carolina National Estuarine Research Reserve (NCNERR) located in the Cape Fear River basin, the monitoring stations in Research Creek, Loosin Creek, Zeke's Basin, and East Cribbing each collect data on water quality and nutrients. We wanted to know if dissolved oxygen and chlorophyll (key indicators of algal blooms) have changed over time in this region, and if a relationship can be found between nutrient variables associated with eutrophication.
+  
+  Our research questions are:
+    1) Has there been significant statistical trends in the dissolved oxygen and chlorophyll a concentrations at the water quality monitoring stations over time?
+    2a) Which water nutrient variables are most strongly predictive of dissolved oxygen and chlorphyll a?
+      2b) Has there been significant statistical trends in the most predictive nutrients variables over time?
+  
 
 \clearpage
 
@@ -2287,5 +2295,7 @@ For **Zeke's Basin**, NH4 had a significant downward trend and temperature had a
 \clearpage
 
 # 8. References
+
+Chislock, M. F., Doster, E., Zitomer, R. A. & Wilson, A. E. (2013) Eutrophication: Causes, Consequences, and Controls in Aquatic Ecosystems. Nature Education Knowledge 4(4):10
 
 NOAA National Estuarine Research Reserve System (NERRS). System-wide Monitoring Program. Data accessed from the NOAA NERRS Centralized Data Management Office website: http://www.nerrsdata.org; accessed 12 October 2025. doi:10.25921/vw8a-8031.
