@@ -49,7 +49,6 @@ knitr::include_graphics(c("NOCEC.png",
   Our research questions are:
     1) Has there been significant statistical trends in the dissolved oxygen and chlorophyll a concentrations at the water quality monitoring stations over time?
     2a) Which water nutrient variables are most strongly predictive of dissolved oxygen and chlorphyll a?
-      2b) Has there been significant statistical trends in the most predictive nutrients variables over time?
   
 
 \clearpage
