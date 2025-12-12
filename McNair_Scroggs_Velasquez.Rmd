@@ -75,55 +75,55 @@ We collected the data from the National Estuarine Research Reserve System's Cent
 Exploration of the raw data consisted of understanding the number of files and contents of those files for each Station. Originally, the water quality data and the nutrient data were separate for each station we are studying. We uploaded all of the files with nutrient and water quality data from the four stations we are studying for the years 2002-2024. We obtained a separate file with information about the stations in which the data was collected. 
 
 ```{r import of raw data, message=FALSE, warning=FALSE, include=FALSE}
-sampling_stations <- read_csv("Data/sampling_stations.csv")
+sampling_stations <- read_csv("Data/Raw/sampling_stations.csv")
 
 # Importing the data within each folder as one and then combining data from each folder into their own datasets since they have the same columns
 
 # Nutrients
-nocecnut <- list.files(path = "./Data/nocecnut", 
+nocecnut <- list.files(path = "./Data/Raw/nocecnut", 
                        pattern = "\\.csv$", 
                        full.names = TRUE)
 nocec_nutrients <- nocecnut %>%
   plyr::ldply(read.csv)
 
-noclcnut <- list.files(path = "./Data/noclcnut", 
+noclcnut <- list.files(path = "./Data/Raw/noclcnut", 
                        pattern = "\\.csv$", 
                        full.names = TRUE)
 noclc_nutrients <- noclcnut %>%
   plyr::ldply(read.csv)
 
-nocrcnut <- list.files(path = "./Data/nocrcnut", 
+nocrcnut <- list.files(path = "./Data/Raw/nocrcnut", 
                        pattern = "\\.csv$", 
                        full.names = TRUE)
 nocrc_nutrients <- nocrcnut %>%
   plyr::ldply(read.csv)
 
-noczbnut <- list.files(path = "./Data/noczbnut", 
+noczbnut <- list.files(path = "./Data/Raw/noczbnut", 
                        pattern = "\\.csv$", 
                        full.names = TRUE)
 noczb_nutrients <- noczbnut %>%
   plyr::ldply(read.csv)
 
 # Water Quality 
-nocecwq <- list.files(path = "./Data/nocecwq", 
+nocecwq <- list.files(path = "./Data/Raw/nocecwq", 
                       pattern = "\\.csv$", 
                       full.names = TRUE)
 nocec_water_quality <- nocecwq %>%
   plyr::ldply(read.csv)
 
-noclcwq <- list.files(path = "./Data/noclcwq", 
+noclcwq <- list.files(path = "./Data/Raw/noclcwq", 
                       pattern = "\\.csv$", 
                       full.names = TRUE)
 noclc_water_quality <- noclcwq %>%
   plyr::ldply(read.csv)
 
-nocrcwq <- list.files(path = "./Data/nocrcwq", 
+nocrcwq <- list.files(path = "./Data/Raw/nocrcwq", 
                       pattern = "\\.csv$", 
                       full.names = TRUE)
 nocrc_water_quality <- nocrcwq %>%
   plyr::ldply(read.csv)
 
-noczbwq <- list.files(path = "./Data/noczbwq", 
+noczbwq <- list.files(path = "./Data/Raw/noczbwq", 
                       pattern = "\\.csv$", 
                       full.names = TRUE)
 noczb_water_quality <- noczbwq %>%
@@ -367,13 +367,13 @@ stations_wq_nutr_cleaned <- merged_test %>%
 
 write.csv(water_quality_stations, row.names = FALSE, 
           file =
-            "./Data/water_quality_stations_monthlyavg_cleaned")
+            "./Data/Processed/water_quality_stations_monthlyavg_cleaned")
 write.csv(nutrients_stations_monthlyavg, row.names = FALSE, 
           file =
-            "./Data/nutrients_stations_monthlyavg_cleaned")
+            "./Data/Processed/nutrients_stations_monthlyavg_cleaned")
 write.csv(stations_wq_nutr_cleaned, row.names = FALSE,
           file =
-            "./Data/stations_wq_nutr_cleaned")
+            "./Data/Processed/stations_wq_nutr_cleaned")
 ```
 
 After cleaning, preparing, and combining all of the files into one data set for nutrients and one data set for water quality, we added the sampling station data to each. This allowed us to create two large data sets which we will use for our study. With so multiple samples taken per day, we decided to get a monthly average of the data since our study focuses on the changes in nutrients and water quality over a 12 year period (2002-2024). Finally, we saved our new completed datasets as new csv files to ensure they were saved properly and could be used in future studies if need be.
