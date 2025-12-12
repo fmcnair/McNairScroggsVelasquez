@@ -1,7 +1,7 @@
 ---
 title: "Final Project"
 subtitle: ENVIRON 872
-author: "Flannery McNair, Andi Scroggs, and Alonso Valasquez"
+author: "Flannery McNair, Andi Scroggs, and Alonso Velasquez"
 date: "2025-12-05"
 output:
   html_document:
@@ -55,9 +55,11 @@ knitr::include_graphics(c("NOCEC.png",
   
   Our research questions are:
     
-  1) Has there been significant statistical trends in the dissolved oxygen and chlorophyll a concentrations at the water quality monitoring stations over time?
+   1. Has there been significant statistical trends in the dissolved oxygen and chlorophyll a concentrations at the water quality monitoring stations over time?
     
-  2a) Which water nutrient variables are most strongly predictive of dissolved oxygen and chlorphyll a?
+   2a. Which water nutrient variables are most strongly predictive of dissolved oxygen and chlorphyll a?
+
+   2b. Have these strongly predictive variables had significant statistical trends in their concentrations at the water quality monitoring stations over time?
   
 
 \clearpage
@@ -401,7 +403,7 @@ our_theme <- theme_classic(base_size = 14,
 ```
 
 Our 4 water monitoring stations are located around the Cape Fear River basin, North Carolina.
-```{r mapView of NCNERR Water Monitoring Stations, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Map of NC NERR Water Monitoring Stations"}
+```{r mapView of NCNERR Water Monitoring Stations, echo=FALSE, fig.align='center', fig.cap="Map of NC NERR Water Monitoring Stations", message=FALSE, warning=FALSE}
 NCNERR_WaterMonitoringStations <- stations_wq_nutr_cleaned %>% 
   group_by(StationName, Longitude, Latitude) %>% 
   summarise() %>% 
@@ -460,6 +462,7 @@ stations_wq_nutr_cleaned %>%
   ylab("Dissolved Oxygen (mg/L)") +
   theme(axis.text.x = (element_text(size=7))) +
   facet_wrap(vars(StationName), nrow = 4) +
+  labs(color = "Station Name") +
   our_theme
 ```
 *It is important to note that the East Cribbing's data seems to end by 2022.*
@@ -684,6 +687,7 @@ stations_wq_nutr_cleaned %>%
   theme(axis.text.x = (element_text(size=7))) +
   facet_wrap(vars(StationName), nrow = 4) +
   scale_y_continuous(limits = c(0,75)) +
+  labs(color = "Station Name") +
   our_theme
 ```
 Although plotting Chlorophyll is helpful for seeing consistent patterns and concentrations across all four stations, let's look at them separately to see gaps and data coverage.
