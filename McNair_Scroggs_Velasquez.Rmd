@@ -488,8 +488,7 @@ Temp_x_limits <- c(0, 35)
 Temp_DO_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = Temp, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x, 
+  geom_smooth(method = "lm", 
               se = FALSE, aes(color = NULL)) +
   xlab("Temperature (Celsius)") +
   ylab("Dissolved Oxygen (mg/L)") +
@@ -500,8 +499,7 @@ Temp_DO_combined <- stations_wq_nutr_cleaned %>%
 Temp_DO_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = Temp, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.4, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x,
+  geom_smooth(method = "lm",
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
@@ -523,8 +521,7 @@ plot_grid(
 NO3F_DO_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = NO3F, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x, 
+  geom_smooth(method = "lm", 
               se = FALSE, 
               aes(color = NULL)) +
   xlab("Nitrate (mg/L)") +
@@ -535,8 +532,7 @@ NO3F_DO_combined <- stations_wq_nutr_cleaned %>%
 NO3F_DO_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = NO3F, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.4, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x,
+  geom_smooth(method = "lm",
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
@@ -560,7 +556,7 @@ PO4F_x_limits <- c(-0.001, 0.15)
 PO4F_DO_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = PO4F, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm, formula = y ~ x, se = FALSE, aes(color = NULL)) +
+  geom_smooth(method = "lm", se = FALSE, aes(color = NULL)) +
   xlab("PO4 (mg/L)") +
   ylab("Dissolved Oxygen (mg/L)") +
   scale_x_continuous(limits = PO4F_x_limits) +
@@ -570,7 +566,7 @@ PO4F_DO_combined <- stations_wq_nutr_cleaned %>%
 PO4F_DO_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = PO4F, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.4, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm, formula = y ~ x, 
+  geom_smooth(method = "lm", 
               se = FALSE, 
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
@@ -594,8 +590,7 @@ NH4F_x_limits <- c(-0.01, 0.5)
 NH4F_DO_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = NH4F, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x, 
+  geom_smooth(method = "lm", 
               se = FALSE, aes(color = NULL)) +
   xlab("Ammonium (mg/L)") +
   ylab("Dissolved Oxygen (mg/L)") +
@@ -606,8 +601,7 @@ NH4F_DO_combined <- stations_wq_nutr_cleaned %>%
 NH4F_DO_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = NH4F, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.4, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x,
+  geom_smooth(method = "lm",
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
@@ -630,8 +624,7 @@ plot_grid(
 Depth_DO_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = Depth, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x, 
+  geom_smooth(method = "lm", 
               se = FALSE, 
               aes(color = NULL)) +
   xlab("Depth (m)") +
@@ -642,8 +635,7 @@ Depth_DO_combined <- stations_wq_nutr_cleaned %>%
 Depth_DO_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = Depth, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.4, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x,
+  geom_smooth(method = "lm",
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), 
@@ -715,8 +707,7 @@ CHLA_N_y_limits <- c(0,75)
 Temp_CHLA_N_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = Temp, y = CHLA_N, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x, 
+  geom_smooth(method = "lm", 
               se = FALSE, aes(color = NULL)) +
   xlab("Temperature (Celsius)") +
   ylab("Chlorophyll a (ug/L)") +
@@ -728,8 +719,7 @@ Temp_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
 Temp_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = Temp, y = CHLA_N, color = StationName)) +
   geom_point(size = 1.4, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x,
+  geom_smooth(method = "lm",
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
@@ -755,8 +745,7 @@ CHLA_N_y_limits <- c(0,75)
 NO3F_CHLA_N_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = NO3F, y = CHLA_N, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x, 
+  geom_smooth(method = "lm", 
               se = FALSE, aes(color = NULL)) +
   xlab("Nitrate (mg/L)") +
   ylab("Chlorophyll a (ug/L)") +
@@ -767,8 +756,7 @@ NO3F_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
 NO3F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = NO3F, y = CHLA_N, color = StationName)) +
   geom_point(size = 1.4, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x,
+  geom_smooth(method = "lm",
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
@@ -794,8 +782,7 @@ CHLA_N_y_limits <- c(0,75)
 PO4F_CHLA_N_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = PO4F, y = CHLA_N, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x, 
+  geom_smooth(method = "lm", 
               se = FALSE, aes(color = NULL)) +
   xlab("Phosphate (mg/L)") +
   ylab("Chlorophyll a (ug/L)") +
@@ -807,8 +794,7 @@ PO4F_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
 PO4F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = PO4F, y = CHLA_N, color = StationName)) +
   geom_point(size = 1.4, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x,
+  geom_smooth(method = "lm",
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
@@ -835,8 +821,7 @@ CHLA_N_y_limits <- c(0,75)
 NH4F_CHLA_N_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = NH4F, y = CHLA_N, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x, 
+  geom_smooth(method = "lm", 
               se = FALSE, aes(color = NULL)) +
   xlab("Ammonium (mg/L)") +
   ylab("Chlorophyll a (ug/L)") +
@@ -848,8 +833,7 @@ NH4F_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
 NH4F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = NH4F, y = CHLA_N, color = StationName)) +
   geom_point(size = 1.4, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x,
+  geom_smooth(method = "lm",
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
@@ -875,8 +859,7 @@ CHLA_N_y_limits <- c(0,75)
 Depth_CHLA_N_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = Depth, y = CHLA_N, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x, 
+  geom_smooth(method = "lm", 
               se = FALSE, aes(color = NULL)) +
   xlab("Depth (m)") +
   ylab("Chlorophyll a (ug/L)") +
@@ -887,8 +870,7 @@ Depth_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
 Depth_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = Depth, y = CHLA_N, color = StationName)) +
   geom_point(size = 1.4, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x,
+  geom_smooth(method = "lm",
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
@@ -916,8 +898,7 @@ CHLA_N_x_limits <- c(0,75)
 DO_CHLA_N_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = CHLA_N, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x, 
+  geom_smooth(method = "lm", 
               se = FALSE, 
               aes(color = NULL)) +
   xlab("Chlorophyll a (ug/L)") +
@@ -929,8 +910,7 @@ DO_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
 DO_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = CHLA_N, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.4, alpha = 0.8) +
-  geom_smooth(method = MASS::rlm,
-              formula = y ~ x,
+  geom_smooth(method = "lm",
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
