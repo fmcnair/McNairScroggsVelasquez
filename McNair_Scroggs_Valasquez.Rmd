@@ -8,6 +8,8 @@ output:
   html_document:
 toc: true
 lof: true
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r libraries, message=FALSE, warning=FALSE, include=FALSE}
@@ -119,11 +121,11 @@ For the nutrient data sets we kept:
 - Station Code
 - Date and Time
 - Orthophosphate (PO4F) (mg/L) 
-- Ammonnium Fluoride (NH4F) (mg/L) 
-- Nitryl Fluoride (NO2F) (mg/L) 
-- Fluorine Nitrate (NO3F) (mg/L) 
-- Nitrate + Nitrate (NO23F) (mg/L)
-- Chlorophyll (ug/L)
+- Ammonium (NH4F) (mg/L) 
+- Nitrite (NO2F) (mg/L) 
+- Nitrate (NO3F) (mg/L) 
+- Nitrite + Nitrate (NO23F) (mg/L)
+- Chlorophyll a (ug/L)
 
 For the water quality data sets we kept the variables:  
 
@@ -415,7 +417,7 @@ stations_wq_nutr_cleaned %>%
   ggplot(aes(x = Date, y = DO_mgl, color = StationName)) +
   geom_line() +
   xlab("Date") +
-  ylab("Dissolved Oxygen (mgl)") +
+  ylab("Dissolved Oxygen (mg/L)") +
   labs(color = "Station Name") +
   our_theme
 ```
@@ -426,7 +428,7 @@ stations_wq_nutr_cleaned %>%
   ggplot(mapping = aes(x=Date, y=DO_mgl)) +
   geom_line(aes(color = StationName),) +
   xlab("Date") +
-  ylab("Dissolved Oxygen (mgl)") +
+  ylab("Dissolved Oxygen (mg/L)") +
   theme(axis.text.x = (element_text(size=7))) +
   facet_wrap(vars(StationName), nrow = 4) +
   our_theme
@@ -441,7 +443,7 @@ stations_wq_nutr_cleaned %>%
   ggplot(aes(x = factor(Month,levels=1:12,labels=month.abb), y = DO_mgl, color = StationName)) +
   geom_boxplot() +
   xlab("Date") +
-  ylab("Dissolved Oxygen (mgl)") +
+  ylab("Dissolved Oxygen (mg/L)") +
   labs(color = "Station Name") +
   our_theme
 ```
@@ -493,7 +495,7 @@ NO3F_DO_combined <- stations_wq_nutr_cleaned %>%
               formula = y ~ x, 
               se = FALSE, 
               aes(color = NULL)) +
-  xlab("Nitrate") +
+  xlab("Nitrate (mg/L)") +
   ylab("Dissolved Oxygen (mg/L)") +
   our_theme +
   theme(legend.position = "none")      # legend on right for combined figure
@@ -506,7 +508,7 @@ NO3F_DO_faceted <- stations_wq_nutr_cleaned %>%
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
-  xlab("Nitrate") +
+  xlab("Nitrate (mg/L)") +
   ylab(NULL) +
   our_theme +
   theme(legend.position = "none")
@@ -527,7 +529,7 @@ PO4F_DO_combined <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = PO4F, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
   geom_smooth(method = MASS::rlm, formula = y ~ x, se = FALSE, aes(color = NULL)) +
-  xlab("PO4F") +
+  xlab("PO4 (mg/L)") +
   ylab("Dissolved Oxygen (mg/L)") +
   scale_x_continuous(limits = PO4F_x_limits) +
   our_theme +
@@ -540,7 +542,7 @@ PO4F_DO_faceted <- stations_wq_nutr_cleaned %>%
               se = FALSE, 
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
-  xlab("PO4F") +
+  xlab("PO4 (mg/L)") +
   ylab(NULL) +
   scale_x_continuous(limits = PO4F_x_limits) +
   our_theme +
@@ -563,7 +565,7 @@ NH4F_DO_combined <- stations_wq_nutr_cleaned %>%
   geom_smooth(method = MASS::rlm,
               formula = y ~ x, 
               se = FALSE, aes(color = NULL)) +
-  xlab("Ammonium") +
+  xlab("Ammonium (mg/L)") +
   ylab("Dissolved Oxygen (mg/L)") +
   scale_x_continuous(limits = NH4F_x_limits) +
   our_theme +
@@ -577,7 +579,7 @@ NH4F_DO_faceted <- stations_wq_nutr_cleaned %>%
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
-  xlab("Ammonium") +
+  xlab("Ammonium (mg/L)") +
   ylab(NULL) +
   scale_x_continuous(limits = NH4F_x_limits) +
   our_theme +
@@ -600,7 +602,7 @@ Depth_DO_combined <- stations_wq_nutr_cleaned %>%
               formula = y ~ x, 
               se = FALSE, 
               aes(color = NULL)) +
-  xlab("Depth") +
+  xlab("Depth (m)") +
   ylab("Dissolved Oxygen (mg/L)") +
   our_theme +
   theme(legend.position = "none")      # legend on right for combined figure
@@ -614,7 +616,7 @@ Depth_DO_faceted <- stations_wq_nutr_cleaned %>%
               aes(color = NULL)) +
   facet_wrap(vars(StationName), 
              nrow = 4) +
-  xlab("Depth") +
+  xlab("Depth (m)") +
   ylab(NULL) +
   our_theme +
   theme(legend.position = "none")
@@ -638,7 +640,7 @@ stations_wq_nutr_cleaned %>%
   ggplot(aes(x = Date, y = CHLA_N, color = StationName)) +
   geom_line() +
   xlab("Date") +
-  ylab("CHLA_N") +
+  ylab("Chlorophyll a (ug/L)") +
   labs(color = "Station Name") +
   our_theme
 ```
@@ -649,7 +651,7 @@ stations_wq_nutr_cleaned %>%
   ggplot(mapping = aes(x=Date, y=CHLA_N)) +
   geom_line(aes(color = StationName),) +
   xlab("Date") +
-  ylab("CHLA_N") +
+  ylab("Chlorophyll a (ug/L)") +
   theme(axis.text.x = (element_text(size=7))) +
   facet_wrap(vars(StationName), nrow = 4) +
   scale_y_continuous(limits = c(0,75)) +
@@ -667,7 +669,7 @@ stations_wq_nutr_cleaned %>%
   ggplot(aes(x = factor(Month,levels=1:12,labels=month.abb), y = CHLA_N, color = StationName)) +
   geom_boxplot() +
   xlab("Date") +
-  ylab("CHLA_N") +
+  ylab("Chlorophyll a (ug/L)") +
   labs(color = "Station Name") +
   scale_y_continuous(limits = c(0,75)) +
   our_theme
@@ -684,7 +686,7 @@ Temp_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
               formula = y ~ x, 
               se = FALSE, aes(color = NULL)) +
   xlab("Temperature (Celsius)") +
-  ylab("CHLA_N") +
+  ylab("Chlorophyll a (ug/L)") +
   scale_x_continuous(limits = Temp_x_limits) +
   scale_y_continuous(limits = CHLA_N_y_limits) +
   our_theme +
@@ -723,8 +725,8 @@ NO3F_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
   geom_smooth(method = MASS::rlm,
               formula = y ~ x, 
               se = FALSE, aes(color = NULL)) +
-  xlab("Nitrate") +
-  ylab("CHLA_N") +
+  xlab("Nitrate (mg/L)") +
+  ylab("Chlorophyll a (ug/L)") +
   scale_y_continuous(limits = CHLA_N_y_limits) +
   our_theme +
   theme(legend.position = "none")      # legend on right for combined figure
@@ -737,7 +739,7 @@ NO3F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
-  xlab("Nitrate") +
+  xlab("Nitrate (mg/L)") +
   ylab(NULL) +
   scale_y_continuous(limits = CHLA_N_y_limits) +
   our_theme +
@@ -762,8 +764,8 @@ PO4F_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
   geom_smooth(method = MASS::rlm,
               formula = y ~ x, 
               se = FALSE, aes(color = NULL)) +
-  xlab("Phosphate") +
-  ylab("CHLA_N") +
+  xlab("Phosphate (mg/L)") +
+  ylab("Chlorophyll a (ug/L)") +
   scale_x_continuous(limits = PO4F_x_limits) +
   scale_y_continuous(limits = CHLA_N_y_limits) +
   our_theme +
@@ -777,7 +779,7 @@ PO4F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
-  xlab("Phosphate") +
+  xlab("Phosphate (mg/L)") +
   ylab(NULL) +
   scale_x_continuous(limits = PO4F_x_limits) +
   scale_y_continuous(limits = CHLA_N_y_limits) +
@@ -803,8 +805,8 @@ NH4F_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
   geom_smooth(method = MASS::rlm,
               formula = y ~ x, 
               se = FALSE, aes(color = NULL)) +
-  xlab("Ammonium") +
-  ylab("CHLA_N") +
+  xlab("Ammonium (mg/L)") +
+  ylab("Chlorophyll a (ug/L)") +
   scale_x_continuous(limits = NH4F_x_limits) +
   scale_y_continuous(limits = CHLA_N_y_limits) +
   our_theme +
@@ -818,7 +820,7 @@ NH4F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
-  xlab("Ammonium") +
+  xlab("Ammonium (mg/L)") +
   ylab(NULL) +
   scale_x_continuous(limits = NH4F_x_limits) +
   scale_y_continuous(limits = CHLA_N_y_limits) +
@@ -843,8 +845,8 @@ Depth_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
   geom_smooth(method = MASS::rlm,
               formula = y ~ x, 
               se = FALSE, aes(color = NULL)) +
-  xlab("Depth") +
-  ylab("CHLA_N") +
+  xlab("Depth (m)") +
+  ylab("Chlorophyll a (ug/L)") +
   scale_y_continuous(limits = CHLA_N_y_limits) +
   our_theme +
   theme(legend.position = "none")      # legend on right for combined figure
@@ -857,7 +859,7 @@ Depth_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
-  xlab("Depth") +
+  xlab("Depth (m)") +
   ylab(NULL) +
   scale_y_continuous(limits = CHLA_N_y_limits) +
   our_theme +
@@ -885,7 +887,7 @@ DO_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
               formula = y ~ x, 
               se = FALSE, 
               aes(color = NULL)) +
-  xlab("CHLA_N") +
+  xlab("Chlorophyll a (ug/L)") +
   ylab("Dissolved Oxygen (mg/L)") +
   scale_x_continuous(limits = CHLA_N_x_limits) +
   our_theme +
@@ -899,7 +901,7 @@ DO_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
               se = FALSE,
               aes(color = NULL)) +
   facet_wrap(vars(StationName), nrow = 4) +
-  xlab("CHLA_N") +
+  xlab("Chlorophyll a (ug/L)") +
   ylab(NULL) +
   scale_x_continuous(limits = CHLA_N_x_limits) +
   our_theme +
