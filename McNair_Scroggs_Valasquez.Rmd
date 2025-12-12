@@ -448,7 +448,7 @@ stations_wq_nutr_cleaned %>%
 \clearpage
 
 Now we want to look at how dissolved oxygen relates to the other variables. 
-```{r fig.cap="Relationship between temperature and dissolved oxygen", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Relationship between Temperature and Dissolved Oxygen", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 Temp_x_limits <- c(0, 35)
 
 Temp_DO_combined <- stations_wq_nutr_cleaned %>% 
@@ -485,7 +485,7 @@ plot_grid(
 )
 ```
 
-```{r fig.cap="Relationship between nitrate and dissolved oxygen", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Relationship between Nitrate and Dissolved Oxygen", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 NO3F_DO_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = NO3F, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
@@ -520,7 +520,7 @@ plot_grid(
 ```
 \clearpage
 
-```{r fig.cap="Relationship between phosphate and dissolved oxygen", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Relationship between Phosphate and Dissolved Oxygen", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 PO4F_x_limits <- c(-0.001, 0.15)
 
 PO4F_DO_combined <- stations_wq_nutr_cleaned %>% 
@@ -554,7 +554,7 @@ plot_grid(
 )
 ```
 
-```{r fig.cap="Relationship between Ammonium and dissolved oxygen", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Relationship between Ammonium and Dissolved Oxygen", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 NH4F_x_limits <- c(-0.01, 0.5)
 
 NH4F_DO_combined <- stations_wq_nutr_cleaned %>% 
@@ -592,7 +592,7 @@ plot_grid(
 ```
 \clearpage
 
-```{r fig.cap="Relationship between depth and dissolved oxygen", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Relationship between Depth and Dissolved Oxygen", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 Depth_DO_combined <- stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = Depth, y = DO_mgl, color = StationName)) +
   geom_point(size = 1.8, alpha = 0.8) +
@@ -632,7 +632,7 @@ plot_grid(
 
 The other variable we are interested in is chlorophyll. Chlorophyll is essential in many aquatic ecosystems as it is crucial for photosynthesis, is an indicator for algal blooms, and supports food chains.
 
-```{r fig.cap="Chlorophyll concentrations from 2002-2024", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Chlorophyll Concentrations from 2002-2024", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 #looking at chlorophyll over time for each station
 stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = Date, y = CHLA_N, color = StationName)) +
@@ -661,7 +661,7 @@ Loosin Creek and Research Creek seem to have less fluctuation in their Chlorophy
 \clearpage
 
 It seems that there's variation in chlorophyll across the year. What do the monthly spreads look like?
-```{r fig.cap="Chlorophyll monthly concentrations", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
+```{r fig.cap="Chlorophyll Monthly Concentrations", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 #looking at monthly averages
 stations_wq_nutr_cleaned %>%
   ggplot(aes(x = factor(Month,levels=1:12,labels=month.abb), y = CHLA_N, color = StationName)) +
@@ -673,7 +673,7 @@ stations_wq_nutr_cleaned %>%
   our_theme
 ```
 
-```{r fig.cap="Relationship between temperature and chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Relationship between Temperature and Chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 #Looking at temperature vs dissolved oxygen with trend line
 Temp_x_limits <- c(0, 35)
 CHLA_N_y_limits <- c(0,75)
@@ -713,7 +713,7 @@ plot_grid(
 )
 ```
 
-```{r fig.cap="Relationship between nitrate and chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Relationship between Nitrate and Chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 #Looking at nitrate vs chlorophyll with trend line
 CHLA_N_y_limits <- c(0,75)
 
@@ -751,7 +751,7 @@ plot_grid(
 )
 ```
 
-```{r fig.cap="Relationship between phosphate and chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Relationship between Phosphate and Chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 #looking at phosphate vs chlorophyll with trend line
 PO4F_x_limits <- c(-0.001, 0.15)
 CHLA_N_y_limits <- c(0,75)
@@ -792,7 +792,7 @@ plot_grid(
 )
 ```
 
-```{r fig.cap="Relationship between ammonium and chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Relationship between Ammonium and Chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 #Looking at ammonium vs chlorophyll with trend line
 NH4F_x_limits <- c(-0.01, 0.5)
 CHLA_N_y_limits <- c(0,75)
@@ -833,7 +833,7 @@ plot_grid(
 )
 ```
 
-```{r fig.cap="Relationship between depth and chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Relationship between Depth and Chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 #Looking at depth vs chlorophyll with trend line
 CHLA_N_y_limits <- c(0,75)
 
@@ -871,6 +871,7 @@ plot_grid(
 )
 ```
 \clearpage
+## 5.3 Chlorophyll and Dissolved Oxygen 
 
 Now to see if there is a relationship between the two variables we care the most about:
 ```{r fig.cap="Relationship between dissolved oxygen and chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
@@ -914,14 +915,14 @@ plot_grid(
 \clearpage
 
 # 6. Analysis
-We want to do two main things: 1) Identify if there is a trend in decreasing dissolved oxygen and increasing chlorophyll across time, and 2) identify the variables most strongly correlated with possible changes.
+To test our hypothesis, we want to do two main things: 1) Identify if there is a trend in decreasing dissolved oxygen and increasing chlorophyll across time, and 2) identify the variables most strongly correlated with possible changes.
 
 First, we must turn dissolved oxygen into a time series across each station.
 
-## 6.1 Time Series Trend Analysis
+## 6.1 Dissolved Oxygen Time Series Trend Analysis
 
 **East Cribbing**
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, , out.width='65%'}
+```{r echo=FALSE, fig.cap="Decomposed Components of East Cribbing Dissolved Oxygen Time Series", fig.align='center', message=FALSE, warning=FALSE, , out.width='65%'}
 #selecting just East Cribbing's DO data and filtering out years with no data
 EastCribbing_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "East Cribbing") %>% 
@@ -951,7 +952,9 @@ EastCribbingDO.monthly.decomposed <- stl(EastCribbingDO.monthly.ts, s.window = "
 
 #plotting
 plot(EastCribbingDO.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of East Cribbing Dissolved Oxygen", fig.align='center', message=FALSE, warning=FALSE, , out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 EastCribbingDO.monthly.trend <- 
   Kendall::SeasonalMannKendall(EastCribbingDO.monthly.ts)
@@ -963,7 +966,7 @@ EastCribbingDO.monthly.nonseas <- (EastCribbingDO.monthly.ts - EastCribbingDO.mo
 
 #making sure it worked
 plot(EastCribbingDO.monthly.nonseas)
-plot(EastCribbingDO.monthly.ts)
+#plot(EastCribbingDO.monthly.ts)
 
 #16: Running Mann Kendall on non-seasonal Ozone monthly series
 EastCribbingDO.monthly.nonseas.trend <- trend::mk.test(EastCribbingDO.monthly.nonseas)
@@ -972,7 +975,7 @@ EastCribbingDO.monthly.nonseas.trend
 ```
 
 **Loosin Creek**
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r echo=FALSE, fig.cap="Decomposed Components of East Cribbing Dissolved Oxygen Time Series", message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 #selecting just Loosin Creek's DO data and filtering out years with no data
 LoosinCreek_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Loosin Creek") %>% 
@@ -1001,7 +1004,9 @@ LoosinCreekDO.monthly.decomposed <- stl(LoosinCreekDO.monthly.ts, s.window = "pe
 
 #plotting
 plot(LoosinCreekDO.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Loosin Creek Dissolved Oxygen", fig.align='center', message=FALSE, warning=FALSE, , out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 LoosinCreekDO.monthly.trend <- 
   Kendall::SeasonalMannKendall(LoosinCreekDO.monthly.ts)
@@ -1013,7 +1018,7 @@ LoosinCreekDO.monthly.nonseas <- (LoosinCreekDO.monthly.ts - LoosinCreekDO.month
 
 #making sure it worked
 plot(LoosinCreekDO.monthly.nonseas)
-plot(LoosinCreekDO.monthly.ts)
+#plot(LoosinCreekDO.monthly.ts)
 
 #Running Mann Kendall on non-seasonal monthly series
 LoosinCreekDO.monthly.nonseas.trend <- trend::mk.test(LoosinCreekDO.monthly.nonseas)
@@ -1022,7 +1027,7 @@ LoosinCreekDO.monthly.nonseas.trend
 ```
 
 **Research Creek**
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r echo=FALSE, fig.cap="Decomposed Components of Research Creek Dissolved Oxygen Time Series", message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 #selecting just Research Creek's DO data and filtering out years with no data
 ResearchCreek_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Research Creek") %>% 
@@ -1051,7 +1056,9 @@ ResearchCreekDO.monthly.decomposed <- stl(ResearchCreekDO.monthly.ts, s.window =
 
 #plotting
 plot(ResearchCreekDO.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Research Creek Dissolved Oxygen", fig.align='center', message=FALSE, warning=FALSE, , out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 ResearchCreekDO.monthly.trend <- 
   Kendall::SeasonalMannKendall(ResearchCreekDO.monthly.ts)
@@ -1063,7 +1070,7 @@ ResearchCreekDO.monthly.nonseas <- (ResearchCreekDO.monthly.ts - ResearchCreekDO
 
 #making sure it worked
 plot(ResearchCreekDO.monthly.nonseas)
-plot(ResearchCreekDO.monthly.ts)
+#plot(ResearchCreekDO.monthly.ts)
 
 #Running Mann Kendall on non-seasonal monthly series
 ResearchCreekDO.monthly.nonseas.trend <- trend::mk.test(ResearchCreekDO.monthly.nonseas)
@@ -1072,7 +1079,7 @@ ResearchCreekDO.monthly.nonseas.trend
 ```
 
 **Zeke's Basin**
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r echo=FALSE, fig.cap="Decomposed Components of Zeke's Basin Dissolved Oxygen Time Series", message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 #selecting just Research Creek's DO data and filtering out years with no data
 ZekesBasin_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Zeke's Basin") %>% 
@@ -1101,7 +1108,9 @@ ZekesBasinDO.monthly.decomposed <- stl(ZekesBasinDO.monthly.ts, s.window = "peri
 
 #plotting
 plot(ZekesBasinDO.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Zeke's Basin Dissolved Oxygen", fig.align='center', message=FALSE, warning=FALSE, , out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 ZekesBasinDO.monthly.trend <- 
   Kendall::SeasonalMannKendall(ZekesBasinDO.monthly.ts)
@@ -1114,7 +1123,7 @@ ZekesBasinDO.monthly.nonseas <- (ZekesBasinDO.monthly.ts - ZekesBasinDO.monthly.
 
 #making sure it worked
 plot(ZekesBasinDO.monthly.nonseas)
-plot(ZekesBasinDO.monthly.ts)
+#plot(ZekesBasinDO.monthly.ts)
 
 #Running Mann Kendall on non-seasonal monthly series
 ZekesBasinDO.monthly.nonseas.trend <- trend::mk.test(ZekesBasinDO.monthly.nonseas)
@@ -1123,10 +1132,10 @@ ZekesBasinDO.monthly.nonseas.trend
 ```
 All Monitoring Stations have had statistically significant trends in their Dissolved Oxygen.
 
-## 6.2 Significant Variables 
+## 6.2 Chlorophyll Time Series Trend Analysis
 
 **East Cribbing**
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+```{r echo=FALSE, fig.cap="Decomposed Components of East Cribbing Chlorophyll Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #selecting just East Cribbing's CHLA data and filtering out years with no data
 EastCribbing_CHLA_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "East Cribbing") %>% 
@@ -1142,11 +1151,11 @@ colnames(EastCribbing_CHLA_months) <- "Date"
 #Left joining to point out gaps
 EastCribbing_CHLA_timeseries_ready <- left_join(EastCribbing_CHLA_months, EastCribbing_CHLA_monthly, by = "Date")
 
-#Using linear interpolation to fill in DO
+#Using linear interpolation to fill in CHLA
 EastCribbing_CHLA_timeseries_ready$CHLA_N = 
   zoo::na.approx(EastCribbing_CHLA_timeseries_ready$CHLA_N, rule = 2)
 
-#Creating time series for East Cribbing's DO
+#Creating time series for East Cribbing's CHLA
 EastCribbingCHLA.monthly.ts <- ts(EastCribbing_CHLA_timeseries_ready$CHLA_N, frequency = 12, start = c(2002,4))
 
 #Decomposing
@@ -1154,7 +1163,9 @@ EastCribbingCHLA.monthly.decomposed <- stl(EastCribbingCHLA.monthly.ts, s.window
 
 #plotting
 plot(EastCribbingCHLA.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of East Cribbing Chlorophyll", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 EastCribbingCHLA.monthly.trend <- 
   Kendall::SeasonalMannKendall(EastCribbingCHLA.monthly.ts)
@@ -1166,7 +1177,7 @@ EastCribbingCHLA.monthly.nonseas <- (EastCribbingCHLA.monthly.ts - EastCribbingC
 
 #making sure it worked
 plot(EastCribbingCHLA.monthly.nonseas)
-plot(EastCribbingCHLA.monthly.ts)
+#plot(EastCribbingCHLA.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 EastCribbingCHLA.monthly.nonseas.trend <- trend::mk.test(EastCribbingCHLA.monthly.nonseas)
@@ -1175,7 +1186,7 @@ EastCribbingCHLA.monthly.nonseas.trend
 ```
 
 **Loosin Creek**
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+```{r echo=FALSE, fig.cap="Decomposed Components of Loosin Creek Chlorophyll Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #selecting just Loosin Creek's CHLA data and filtering out years with no data
 LoosinCreek_CHLA_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Loosin Creek") %>% 
@@ -1203,7 +1214,9 @@ LoosinCreekCHLA.monthly.decomposed <- stl(LoosinCreekCHLA.monthly.ts, s.window =
 
 #plotting
 plot(LoosinCreekCHLA.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Loosin Creek Chlorophyll", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 LoosinCreekCHLA.monthly.trend <- 
   Kendall::SeasonalMannKendall(LoosinCreekCHLA.monthly.ts)
@@ -1215,7 +1228,7 @@ LoosinCreekCHLA.monthly.nonseas <- (LoosinCreekCHLA.monthly.ts - LoosinCreekCHLA
 
 #making sure it worked
 plot(LoosinCreekCHLA.monthly.nonseas)
-plot(LoosinCreekCHLA.monthly.ts)
+#plot(LoosinCreekCHLA.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 LoosinCreekCHLA.monthly.nonseas.trend <- trend::mk.test(LoosinCreekCHLA.monthly.nonseas)
@@ -1224,7 +1237,7 @@ LoosinCreekCHLA.monthly.nonseas.trend
 ```
 
 **Research Creek**
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+```{r echo=FALSE, fig.cap="Decomposed Components of Research Creek Chlorophyll Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #selecting just Research Creek's CHLA data and filtering out years with no data
 ResearchCreek_CHLA_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Research Creek") %>% 
@@ -1253,7 +1266,9 @@ ResearchCreekCHLA.monthly.decomposed <- stl(ResearchCreekCHLA.monthly.ts, s.wind
 
 #plotting
 plot(ResearchCreekCHLA.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Research Creek Chlorophyll", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 ResearchCreekCHLA.monthly.trend <- 
   Kendall::SeasonalMannKendall(ResearchCreekCHLA.monthly.ts)
@@ -1265,7 +1280,7 @@ ResearchCreekCHLA.monthly.nonseas <- (ResearchCreekCHLA.monthly.ts - ResearchCre
 
 #making sure it worked
 plot(ResearchCreekCHLA.monthly.nonseas)
-plot(ResearchCreekCHLA.monthly.ts)
+#plot(ResearchCreekCHLA.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 ResearchCreekCHLA.monthly.nonseas.trend <- trend::mk.test(ResearchCreekCHLA.monthly.nonseas)
@@ -1274,7 +1289,7 @@ ResearchCreekCHLA.monthly.nonseas.trend
 ```
 
 **Zeke's Basin**
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+```{r echo=FALSE, fig.cap="Decomposed Components of Zeke's Basin Chlorophyll Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #selecting just Zeke's Basin's CHLA data and filtering out years with no data
 ZekeBasin_CHLA_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Zeke's Basin") %>% 
@@ -1303,7 +1318,9 @@ ZekeBasinCHLA.monthly.decomposed <- stl(ZekeBasinCHLA.monthly.ts, s.window = "pe
 
 #plotting
 plot(ZekeBasinCHLA.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Zeke's Basin Chlorophyll", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 ZekeBasinCHLA.monthly.trend <- 
   Kendall::SeasonalMannKendall(ZekeBasinCHLA.monthly.ts)
@@ -1315,7 +1332,7 @@ ZekeBasinCHLA.monthly.nonseas <- (ZekeBasinCHLA.monthly.ts - ZekeBasinCHLA.month
 
 #making sure it worked
 plot(ZekeBasinCHLA.monthly.nonseas)
-plot(ZekeBasinCHLA.monthly.ts)
+#plot(ZekeBasinCHLA.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 ZekeBasinCHLA.monthly.nonseas.trend <- trend::mk.test(ZekeBasinCHLA.monthly.nonseas)
@@ -1324,7 +1341,9 @@ ZekeBasinCHLA.monthly.nonseas.trend
 ```
 All of the stations have statistically significant trends in their DO and Chlorophyll levels. So now we ask, which variables are most responsible for these changes?  
 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+## Multiple Regression
+
+```{r echo=FALSE, fig.align='center', warning=FALSE, out.width='65%'}
 #DO
 stations_wo_na <- stations_wq_nutr_cleaned[complete.cases(
   stations_wq_nutr_cleaned[, c("DO_mgl","Temp","PO4F","NH4F","NO3F", "CHLA_N")]), ]
@@ -1348,11 +1367,13 @@ From these multiple regressions we find that temperature, phosphorus, and nitrat
 
 Temperature is the most impactful variable in both of the models, with PO4 being the least impactful. 
 
-## 6.3 Second Time Series Analysis 
+## 6.4 Time Series Analysis of Relevant Variables
 From here, we perform time series analyses on these variables to determine if their trends are in line with what we expect. 
 
-Here are the variables for **East Cribbing**. 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+### 6.4.1 East Cribbing 
+
+**PO4**
+```{r echo=FALSE, fig.cap="Decomposed Components of East Cribbing PO4 Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #PO4 - East Cribbing
 EastCribbing_PO4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "East Cribbing") %>% 
@@ -1385,7 +1406,10 @@ EastCribbing.PO4.monthly.decomposed <- stl(EastCribbing.PO4.monthly.ts,
 
 #plotting
 plot(EastCribbing.PO4.monthly.decomposed)
+```
 
+
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of East Cribbing PO4", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 EastCribbing.PO4.monthly.trend <- 
   Kendall::SeasonalMannKendall(EastCribbing.PO4.monthly.ts)
@@ -1398,15 +1422,16 @@ EastCribbing.PO4.monthly.nonseas <- (EastCribbing.PO4.monthly.ts -
 
 #making sure it worked
 plot(EastCribbing.PO4.monthly.nonseas)
-plot(EastCribbing.PO4.monthly.ts)
+#plot(EastCribbing.PO4.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 EastCribbing.PO4.monthly.nonseas.trend <- trend::mk.test(EastCribbing.PO4.monthly.nonseas)
 # Inspect results
 EastCribbing.PO4.monthly.nonseas.trend
 ```
-Increasing trend of PO4, significant. 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+
+**NH4**
+```{r echo=FALSE, fig.cap="Decomposed Components of East Cribbing NH4 Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #NH4 - East Cribbing
 EastCribbing_NH4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "East Cribbing") %>% 
@@ -1439,7 +1464,9 @@ EastCribbing.NH4.monthly.decomposed <- stl(EastCribbing.NH4.monthly.ts,
 
 #plotting
 plot(EastCribbing.NH4.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of East Cribbing NH4", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 EastCribbing.NH4.monthly.trend <- 
   Kendall::SeasonalMannKendall(EastCribbing.NH4.monthly.ts)
@@ -1452,15 +1479,16 @@ EastCribbing.NH4.monthly.nonseas <- (EastCribbing.NH4.monthly.ts -
 
 #making sure it worked
 plot(EastCribbing.NH4.monthly.nonseas)
-plot(EastCribbing.NH4.monthly.ts)
+#plot(EastCribbing.NH4.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 EastCribbing.NH4.monthly.nonseas.trend <- trend::mk.test(EastCribbing.NH4.monthly.nonseas)
 # Inspect results
 EastCribbing.NH4.monthly.nonseas.trend
 ```
-Decreasing trend of NH4, significant. 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+
+**NO3**
+```{r echo=FALSE, fig.cap="Decomposed Components of East Cribbing NO3 Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #NO3 - East Cribbing
 EastCribbing_NO3_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "East Cribbing") %>% 
@@ -1493,7 +1521,9 @@ EastCribbing.NO3.monthly.decomposed <- stl(EastCribbing.NO3.monthly.ts,
 
 #plotting
 plot(EastCribbing.NO3.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of East Cribbing NO3", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 EastCribbing.NO3.monthly.trend <- 
   Kendall::SeasonalMannKendall(EastCribbing.NO3.monthly.ts)
@@ -1506,15 +1536,16 @@ EastCribbing.NO3.monthly.nonseas <- (EastCribbing.NO3.monthly.ts -
 
 #making sure it worked
 plot(EastCribbing.NO3.monthly.nonseas)
-plot(EastCribbing.NO3.monthly.ts)
+#plot(EastCribbing.NO3.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 EastCribbing.NO3.monthly.nonseas.trend <- trend::mk.test(EastCribbing.NO3.monthly.nonseas)
 # Inspect results
 EastCribbing.NO3.monthly.nonseas.trend
 ```
-Insignificant trend. 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+
+**Temperature**
+```{r echo=FALSE, fig.cap="Decomposed Components of East Cribbing Temperature Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Temp - East Cribbing
 EastCribbing_Temp_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "East Cribbing") %>% 
@@ -1547,7 +1578,9 @@ EastCribbing.Temp.monthly.decomposed <- stl(EastCribbing.Temp.monthly.ts,
 
 #plotting
 plot(EastCribbing.Temp.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of East Cribbing Temperature", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 EastCribbing.Temp.monthly.trend <- 
   Kendall::SeasonalMannKendall(EastCribbing.Temp.monthly.ts)
@@ -1560,18 +1593,19 @@ EastCribbing.Temp.monthly.nonseas <- (EastCribbing.Temp.monthly.ts -
 
 #making sure it worked
 plot(EastCribbing.Temp.monthly.nonseas)
-plot(EastCribbing.Temp.monthly.ts)
+#plot(EastCribbing.Temp.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 EastCribbing.Temp.monthly.nonseas.trend <- trend::mk.test(EastCribbing.Temp.monthly.nonseas)
 # Inspect results
 EastCribbing.Temp.monthly.nonseas.trend
 ```
-Insignificant trend. 
 
-For East Cribbing, PO4 had a significant increasing trend and NH4 has a significant decreasing trend. 
+For East Cribbing, PO4 had a significant increasing trend, NH4 had a significant decreasing trend, and NO3 and temperature did not have statistically significant trends. 
 
-Now let's do **Loosin Creek**. 
+### 6.4.2 Loosin Creek
+
+**PO4**
 ```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #PO4 - Loosin Creek
 LoosinCreek_PO4_monthly <- stations_wq_nutr_cleaned %>%
@@ -1626,7 +1660,9 @@ LoosinCreek.PO4.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.PO4.monthly.
 LoosinCreek.PO4.monthly.nonseas.trend
 ```
 Non seasonal trend is significantly decreasing. 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+
+**NH4**
+```{r echo=FALSE, fig.cap="Decomposed Components of Loosin Creek NH4 Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #NH4 - Loosin Creek
 LoosinCreek_NH4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Loosin Creek") %>% 
@@ -1659,7 +1695,9 @@ LoosinCreek.NH4.monthly.decomposed <- stl(LoosinCreek.NH4.monthly.ts,
 
 #plotting
 plot(LoosinCreek.NH4.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Loosin Creek NH4", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 LoosinCreek.NH4.monthly.trend <- 
   Kendall::SeasonalMannKendall(LoosinCreek.NH4.monthly.ts)
@@ -1672,7 +1710,7 @@ LoosinCreek.NH4.monthly.nonseas <- (LoosinCreek.NH4.monthly.ts -
 
 #making sure it worked
 plot(LoosinCreek.NH4.monthly.nonseas)
-plot(LoosinCreek.NH4.monthly.ts)
+#plot(LoosinCreek.NH4.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 LoosinCreek.NH4.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.NH4.monthly.nonseas)
@@ -1680,7 +1718,9 @@ LoosinCreek.NH4.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.NH4.monthly.
 LoosinCreek.NH4.monthly.nonseas.trend
 ```
 Decreasing trend, significant. 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+
+**NO3**
+```{r echo=FALSE, fig.cap="Decomposed Components of Loosin Creek NO3 Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #NO3 - Loosin Creek
 LoosinCreek_NO3_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Loosin Creek") %>% 
@@ -1713,7 +1753,9 @@ LoosinCreek.NO3.monthly.decomposed <- stl(LoosinCreek.NO3.monthly.ts,
 
 #plotting
 plot(LoosinCreek.NO3.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Loosin Creek NO3", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 LoosinCreek.NO3.monthly.trend <- 
   Kendall::SeasonalMannKendall(LoosinCreek.NO3.monthly.ts)
@@ -1726,7 +1768,7 @@ LoosinCreek.NO3.monthly.nonseas <- (LoosinCreek.NO3.monthly.ts -
 
 #making sure it worked
 plot(LoosinCreek.NO3.monthly.nonseas)
-plot(LoosinCreek.NO3.monthly.ts)
+#plot(LoosinCreek.NO3.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 LoosinCreek.NO3.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.NO3.monthly.nonseas)
@@ -1734,7 +1776,9 @@ LoosinCreek.NO3.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.NO3.monthly.
 LoosinCreek.NO3.monthly.nonseas.trend
 ```
 Seaonsal trend is significantly decreasing ? 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+
+**Temperature**
+```{r echo=FALSE, fig.cap="Decomposed Components of Loosin Creek Temperature Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Temp - Loosin Creek
 LoosinCreek_Temp_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Loosin Creek") %>% 
@@ -1767,7 +1811,9 @@ LoosinCreek.Temp.monthly.decomposed <- stl(LoosinCreek.Temp.monthly.ts,
 
 #plotting
 plot(LoosinCreek.Temp.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Figure 6.4.2.8: Non-Seasonal Trend of Loosin Creek NO3", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 LoosinCreek.Temp.monthly.trend <- 
   Kendall::SeasonalMannKendall(LoosinCreek.Temp.monthly.ts)
@@ -1780,7 +1826,7 @@ LoosinCreek.Temp.monthly.nonseas <- (LoosinCreek.Temp.monthly.ts -
 
 #making sure it worked
 plot(LoosinCreek.Temp.monthly.nonseas)
-plot(LoosinCreek.Temp.monthly.ts)
+#plot(LoosinCreek.Temp.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 LoosinCreek.Temp.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.Temp.monthly.nonseas)
@@ -1838,7 +1884,7 @@ ResearchCreek.PO4.monthly.nonseas <- (ResearchCreek.PO4.monthly.ts -
 
 #making sure it worked
 plot(ResearchCreek.PO4.monthly.nonseas)
-plot(ResearchCreek.PO4.monthly.ts)
+#plot(ResearchCreek.PO4.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 ResearchCreek.PO4.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.PO4.monthly.nonseas)
@@ -1892,7 +1938,7 @@ ResearchCreek.NH4.monthly.nonseas <- (ResearchCreek.NH4.monthly.ts -
 
 #making sure it worked
 plot(ResearchCreek.NH4.monthly.nonseas)
-plot(ResearchCreek.NH4.monthly.ts)
+#plot(ResearchCreek.NH4.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 ResearchCreek.NH4.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.NH4.monthly.nonseas)
@@ -1946,7 +1992,7 @@ ResearchCreek.NO3.monthly.nonseas <- (ResearchCreek.NO3.monthly.ts -
 
 #making sure it worked
 plot(ResearchCreek.NO3.monthly.nonseas)
-plot(ResearchCreek.NO3.monthly.ts)
+#plot(ResearchCreek.NO3.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 ResearchCreek.NO3.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.NO3.monthly.nonseas)
@@ -2000,7 +2046,7 @@ ResearchCreek.Temp.monthly.nonseas <- (ResearchCreek.Temp.monthly.ts -
 
 #making sure it worked
 plot(ResearchCreek.Temp.monthly.nonseas)
-plot(ResearchCreek.Temp.monthly.ts)
+#plot(ResearchCreek.Temp.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 ResearchCreek.Temp.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.Temp.monthly.nonseas)
@@ -2058,7 +2104,7 @@ ZekeBasin.PO4.monthly.nonseas <- (ZekeBasin.PO4.monthly.ts -
 
 #making sure it worked
 plot(ZekeBasin.PO4.monthly.nonseas)
-plot(ZekeBasin.PO4.monthly.ts)
+#plot(ZekeBasin.PO4.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 ZekeBasin.PO4.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.PO4.monthly.nonseas)
@@ -2112,7 +2158,7 @@ ZekeBasin.NH4.monthly.nonseas <- (ZekeBasin.NH4.monthly.ts -
 
 #making sure it worked
 plot(ZekeBasin.NH4.monthly.nonseas)
-plot(ZekeBasin.NH4.monthly.ts)
+#plot(ZekeBasin.NH4.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 ZekeBasin.NH4.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.NH4.monthly.nonseas)
@@ -2166,7 +2212,7 @@ ZekeBasin.NO3.monthly.nonseas <- (ZekeBasin.NO3.monthly.ts -
 
 #making sure it worked
 plot(ZekeBasin.NO3.monthly.nonseas)
-plot(ZekeBasin.NO3.monthly.ts)
+#plot(ZekeBasin.NO3.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 ZekeBasin.NO3.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.NO3.monthly.nonseas)
@@ -2220,7 +2266,7 @@ ZekeBasin.Temp.monthly.nonseas <- (ZekeBasin.Temp.monthly.ts -
 
 #making sure it worked
 plot(ZekeBasin.Temp.monthly.nonseas)
-plot(ZekeBasin.Temp.monthly.ts)
+#plot(ZekeBasin.Temp.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 ZekeBasin.Temp.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.Temp.monthly.nonseas)
