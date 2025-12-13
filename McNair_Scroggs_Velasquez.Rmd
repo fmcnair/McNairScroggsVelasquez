@@ -2,10 +2,10 @@
 title: "Final Project"
 subtitle: ENVIRON 872
 author: "Flannery McNair, Andi Scroggs, and Alonso Velasquez"
-date: "2025-12-05"
+date: "2025-12-12"
 output:
-  html_document:
   pdf_document: default
+  html_document:
 toc: true
 lof: true
 editor_options: 
@@ -36,6 +36,8 @@ library(sf)
 library(mapview)
 #install.packages("leaflet")
 library(leaflet)
+install.packages("rnaturalearth")
+library(rnaturalearth)
 ```
 \clearpage
 
@@ -57,7 +59,7 @@ knitr::include_graphics(c("NOCEC.png",
     
    1. Has there been significant statistical trends in the dissolved oxygen and chlorophyll a concentrations at the water quality monitoring stations over time?
     
-   2a. Which water nutrient variables are most strongly predictive of dissolved oxygen and chlorphyll a?
+   2a. Which water nutrient variables are most strongly predictive of dissolved oxygen and chlorophyll a?
 
    2b. Have these strongly predictive variables had significant statistical trends in their concentrations at the water quality monitoring stations over time?
   
@@ -404,6 +406,14 @@ our_theme <- theme_classic(base_size = 14,
 
 Our 4 water monitoring stations are located around the Cape Fear River basin, North Carolina.
 ```{r mapView of NCNERR Water Monitoring Stations, echo=FALSE, fig.align='center', fig.cap="Map of NC NERR Water Monitoring Stations", message=FALSE, warning=FALSE}
+
+states <- ne_states(country = "United States of America", returnclass = "sf")
+
+# Filter for NC and surrounding states for context
+nc_states <- states %>%
+  filter(name %in% c("North Carolina", "South Carolina", "Virginia")) %>%
+  st_transform(crs = 4269)
+
 NCNERR_WaterMonitoringStations <- stations_wq_nutr_cleaned %>% 
   group_by(StationName, Longitude, Latitude) %>% 
   summarise() %>% 
@@ -425,12 +435,7 @@ cor_matrix <- cor(num_data,
                   method = "pearson")
 ```
 
-```{r fig.cap="ggpairs", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
-#ggpairs
-ggpairs(num_data)
-```
-
-```{r fig.cap="Corrplot", message=FALSE, warning=FALSE, echo=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Corrplot: Correlation Matrix of Variables", message=FALSE, warning=FALSE, echo=FALSE, fig.align='center', out.width='65%'}
 #corrplot, something more readable than ggpairs
 corrplot(cor_matrix, method = "color", type = "upper",
          tl.col = "black", tl.srt = 45)
@@ -1145,7 +1150,7 @@ ZekesBasinDO.monthly.nonseas.trend <- trend::mk.test(ZekesBasinDO.monthly.nonsea
 # Inspect results
 ZekesBasinDO.monthly.nonseas.trend
 ```
-All Monitoring Stations have had statistically significant trends in their Dissolved Oxygen.
+### All Monitoring Stations have had statistically significant decreasing trends in their Dissolved Oxygen.
 
 ## 6.2 Chlorophyll Time Series Trend Analysis
 
@@ -1354,7 +1359,7 @@ ZekeBasinCHLA.monthly.nonseas.trend <- trend::mk.test(ZekeBasinCHLA.monthly.nons
 # Inspect results
 ZekeBasinCHLA.monthly.nonseas.trend
 ```
-All of the stations have statistically significant trends in their DO and Chlorophyll levels. So now we ask, which variables are most responsible for these changes?  
+All stations have statistically significant increasing trends in their Chlorophyll levels as well. Since all of the stations have statistically significant trends in their DO and Chlorophyll levels, now we ask, which variables are most responsible for these changes?  
 
 ## Multiple Regression
 
@@ -1378,7 +1383,7 @@ CHLA.regression <- lm(data = stations_wq_nutr_cleaned, CHLA_N~ Temp + PO4F
                       + NH4F)
 summary(CHLA.regression)
 ```
-From these multiple regressions we find that temperature, phosphorus, and nitrate are the best variables for predicting DO and temperature, phosphorus, and ammonium are the best variables for predicting Chlorophyll. Both of these relationships are significant, although the R-squared for the Chlorophyll regression is 0.1661 which indicates a weaker correlation. 
+### From these multiple regressions we find that temperature, phosphorus, and nitrate are the best variables for predicting DO and temperature, phosphorus, and ammonium are the best variables for predicting Chlorophyll. Both of these relationships are significant, although the R-squared for the Chlorophyll regression is 0.1661 which indicates a weaker correlation. 
 
 Temperature is the most impactful variable in both of the models, with PO4 being the least impactful. 
 
@@ -1790,7 +1795,7 @@ LoosinCreek.NO3.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.NO3.monthly.
 # Inspect results
 LoosinCreek.NO3.monthly.nonseas.trend
 ```
-Seaonsal trend is significantly decreasing ? 
+Seasonal trend is significantly decreasing ? 
 
 **Temperature**
 ```{r echo=FALSE, fig.cap="Decomposed Components of Loosin Creek Temperature Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
@@ -2296,6 +2301,19 @@ For **Zeke's Basin**, NH4 had a significant downward trend and temperature had a
 
 # 7. Summary and Conclusion
 
+After conducting time series trend analyses on the dissolved oxygen and chlorophyll concentrations across each research station, we found that dissolved oxygen has indeed decreased over time across all monitoring stations, and that Chlorophyll has indeed increased over time across all monitoring stations. This leads us to believe that phytoplankton populations have grown over time in the Cape Fear River basin, and could be contributing to decreasing dissolved oxygen available in the water. After this part of our analysis, we decided to run a step-wise multiple regression for dissolved oxygen and chlorophyll on the water nutrient variables and also temperature across all monitoring stations. We found that temperature, phosphate, and ammonium are the best variables for predicting chlorophyll. On the other hand, we found that temperature, phosphate, and nitrate are the best variables for predicting dissolved oxygen. 
+
+We decided to conduct time series analyses on the temperature, phosphate, nitrate, and ammonium as they best predicted dissolved oxygen and chlorophyll trends. We found the following results for each monitoring station:
+
+East Cribbing: Phosphate had a significant decreasing trend, ammonium had a significant increasing trend, while nitrate and temperature had insignificant trends.
+
+Loosin Creek: Phosphate had a significant decreasing trend, ammonium had a significant decreasing trend, nitrate had a insignificant trend, and temperature had a significant increasing trend.
+
+Research Creek: Phosphate had an insignificant trend, ammonium had a significant decreasing trend, nitrate had a significant increasing trend, and temperature had a significant increasing trend.
+
+Zeke's Basin: Phosphate had an insignificant trend, ammonium had a significant decreasing trend, nitrate had an insignificant trend, and temperature had a significant increasing trend.
+
+From these results, what is consistent across each monitoring station is that temperature has been increasing, which decreases the amount of oxygen available in liquid water while improving conditions for the proliferation of phytoplanktonic communities in the river basin. Additionally, ammonium has a significant decreasing trend across all stations, but this could be a result of phytoplankton uptaking ammonium rapidly (find citation). Similarly, in half of the monitoring stations phosphate is also significantly decreasing (also a potential consequence of phytoplankton uptake). Lastly, nitrate's lack of significant trends leads us to find its role in eutrophication for the river basin inconclusive. Our takeaways are that temperature is absolutely increasing and potentially affecting the dissolved oxygen and phytoplankton communities in the Cape Fear River basin, but the impacts on nutrients are inconclusive -- further research is needed to understand the mechanisms and temporal lag between nutrient concentrations like phosphate and ammonium and phytoplankton populations. Overall, it's difficult to assess conclusions based off of nutrients, as we have a chicken and the egg scenario with our data. However, it is clear that climate change and increasing temperatures are putting the Cape Fear River basin at risk for anoxic conditions as a consequence of warmer water and increasing phytoplanktonic activity, and should be heavily considered in the future coastal management of the region.
 
 \clearpage
 
