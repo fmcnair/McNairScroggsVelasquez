@@ -36,8 +36,7 @@ library(sf)
 library(mapview)
 #install.packages("leaflet")
 library(leaflet)
-install.packages("rnaturalearth")
-library(rnaturalearth)
+library(maps)
 ```
 \clearpage
 
@@ -59,9 +58,9 @@ knitr::include_graphics(c("NOCEC.png",
     
    1. Has there been significant statistical trends in the dissolved oxygen and chlorophyll a concentrations at the water quality monitoring stations over time?
     
-   2a. Which water nutrient variables are most strongly predictive of dissolved oxygen and chlorophyll a?
+   2.0. Which water nutrient variables are most strongly predictive of dissolved oxygen and chlorophyll a?
 
-   2b. Have these strongly predictive variables had significant statistical trends in their concentrations at the water quality monitoring stations over time?
+   2.1. Have these strongly predictive variables had significant statistical trends in their concentrations at the water quality monitoring stations over time?
   
 
 \clearpage
@@ -406,22 +405,27 @@ our_theme <- theme_classic(base_size = 14,
 
 Our 4 water monitoring stations are located around the Cape Fear River basin, North Carolina.
 ```{r mapView of NCNERR Water Monitoring Stations, echo=FALSE, fig.align='center', fig.cap="Map of NC NERR Water Monitoring Stations", message=FALSE, warning=FALSE}
-
-states <- ne_states(country = "United States of America", returnclass = "sf")
-
-# Filter for NC and surrounding states for context
-nc_states <- states %>%
-  filter(name %in% c("North Carolina", "South Carolina", "Virginia")) %>%
-  st_transform(crs = 4269)
-
+#getting our points
 NCNERR_WaterMonitoringStations <- stations_wq_nutr_cleaned %>% 
   group_by(StationName, Longitude, Latitude) %>% 
   summarise() %>% 
   mutate(Longitude = as.numeric(Longitude) * -1) %>% #we accidentally forgot to incorporate "E" into our longitude column
   mutate(Latitude = as.numeric(Latitude)) %>% 
   st_as_sf(coords = c('Longitude','Latitude'), crs=4269)
+#plotting
+ggplot() +
+  borders(
+    database = "state",       
+    regions = c("north carolina", "south carolina", "virginia"), fill = "lightgray", color = "darkgrey") +
+  geom_sf(data = NCNERR_WaterMonitoringStations, aes(color = StationName), size = 4, alpha = 0.7) +
+  coord_sf(xlim = c(-78.8, -76.8), ylim = c(33.5, 36)) +  
+  labs(title = "NC NERR Water Monitoring Stations",
+       subtitle = "Cape Fear River Basin, North Carolina",
+       x = "Longitude",
+       y = "Latitude",
+       color = "Station Name") +
+  theme_bw()
 
-mapView(NCNERR_WaterMonitoringStations, layer.name = "NC NERR Stations")
 ```
 
 
@@ -499,7 +503,7 @@ Temp_DO_combined <- stations_wq_nutr_cleaned %>%
   ylab("Dissolved Oxygen (mg/L)") +
   scale_x_continuous(limits = Temp_x_limits) +
   our_theme +
-  theme(legend.position = "none")      # legend on right for combined figure
+  theme(legend.position = "none")     
 
 Temp_DO_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = Temp, y = DO_mgl, color = StationName)) +
@@ -517,8 +521,8 @@ Temp_DO_faceted <- stations_wq_nutr_cleaned %>%
 plot_grid(
   Temp_DO_combined,
   Temp_DO_faceted,
-  ncol = 2,          # side-by-side layout
-  rel_widths = c(1, 1)  # adjust width proportions if needed
+  ncol = 2,          
+  rel_widths = c(1, 1) 
 )
 ```
 
@@ -532,7 +536,7 @@ NO3F_DO_combined <- stations_wq_nutr_cleaned %>%
   xlab("Nitrate (mg/L)") +
   ylab("Dissolved Oxygen (mg/L)") +
   our_theme +
-  theme(legend.position = "none")      # legend on right for combined figure
+  theme(legend.position = "none")      
 
 NO3F_DO_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = NO3F, y = DO_mgl, color = StationName)) +
@@ -546,12 +550,10 @@ NO3F_DO_faceted <- stations_wq_nutr_cleaned %>%
   our_theme +
   theme(legend.position = "none")
 
-plot_grid(
-  NO3F_DO_combined,
+plot_grid(NO3F_DO_combined,
   NO3F_DO_faceted,
-  ncol = 2,          # side-by-side layout
-  rel_widths = c(1, 1)  # adjust width proportions if needed
-)
+  ncol = 2,          
+  rel_widths = c(1, 1))
 ```
 \clearpage
 
@@ -566,7 +568,7 @@ PO4F_DO_combined <- stations_wq_nutr_cleaned %>%
   ylab("Dissolved Oxygen (mg/L)") +
   scale_x_continuous(limits = PO4F_x_limits) +
   our_theme +
-  theme(legend.position = "none")      # legend on right for combined figure
+  theme(legend.position = "none")     
 
 PO4F_DO_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = PO4F, y = DO_mgl, color = StationName)) +
@@ -581,12 +583,10 @@ PO4F_DO_faceted <- stations_wq_nutr_cleaned %>%
   our_theme +
   theme(legend.position = "none")
 
-plot_grid(
-  PO4F_DO_combined,
+plot_grid(PO4F_DO_combined,
   PO4F_DO_faceted,
-  ncol = 2,          # side-by-side layout
-  rel_widths = c(1, 1)  # adjust width proportions if needed
-)
+  ncol = 2,         
+  rel_widths = c(1, 1))
 ```
 
 ```{r fig.cap="Relationship between Ammonium and Dissolved Oxygen", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
@@ -601,7 +601,7 @@ NH4F_DO_combined <- stations_wq_nutr_cleaned %>%
   ylab("Dissolved Oxygen (mg/L)") +
   scale_x_continuous(limits = NH4F_x_limits) +
   our_theme +
-  theme(legend.position = "none")      # legend on right for combined figure
+  theme(legend.position = "none")      
 
 NH4F_DO_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = NH4F, y = DO_mgl, color = StationName)) +
@@ -616,12 +616,10 @@ NH4F_DO_faceted <- stations_wq_nutr_cleaned %>%
   our_theme +
   theme(legend.position = "none")
 
-plot_grid(
-  NH4F_DO_combined,
+plot_grid(NH4F_DO_combined,
   NH4F_DO_faceted,
-  ncol = 2,          # side-by-side layout
-  rel_widths = c(1, 1)  # adjust width proportions if needed
-)
+  ncol = 2,          
+  rel_widths = c(1, 1))
 ```
 \clearpage
 
@@ -635,7 +633,7 @@ Depth_DO_combined <- stations_wq_nutr_cleaned %>%
   xlab("Depth (m)") +
   ylab("Dissolved Oxygen (mg/L)") +
   our_theme +
-  theme(legend.position = "none")      # legend on right for combined figure
+  theme(legend.position = "none")   
 
 Depth_DO_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = Depth, y = DO_mgl, color = StationName)) +
@@ -650,12 +648,10 @@ Depth_DO_faceted <- stations_wq_nutr_cleaned %>%
   our_theme +
   theme(legend.position = "none")
 
-plot_grid(
-  Depth_DO_combined,
+plot_grid(Depth_DO_combined,
   Depth_DO_faceted,
-  ncol = 2,          # side-by-side layout
-  rel_widths = c(1, 1)  # adjust width proportions if needed
-)
+  ncol = 2,          
+  rel_widths = c(1, 1))
 ```
 \clearpage
 
@@ -719,7 +715,7 @@ Temp_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
   scale_x_continuous(limits = Temp_x_limits) +
   scale_y_continuous(limits = CHLA_N_y_limits) +
   our_theme +
-  theme(legend.position = "none")      # legend on right for combined figure
+  theme(legend.position = "none")      
 
 Temp_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = Temp, y = CHLA_N, color = StationName)) +
@@ -735,12 +731,10 @@ Temp_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   our_theme +
   theme(legend.position = "none")
 
-plot_grid(
-  Temp_CHLA_N_combined,
+plot_grid(Temp_CHLA_N_combined,
   Temp_CHLA_N_faceted,
-  ncol = 2,          # side-by-side layout
-  rel_widths = c(1, 1)  # adjust width proportions if needed
-)
+  ncol = 2,          
+  rel_widths = c(1, 1))
 ```
 
 ```{r fig.cap="Relationship between Nitrate and Chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
@@ -756,7 +750,7 @@ NO3F_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
   ylab("Chlorophyll a (ug/L)") +
   scale_y_continuous(limits = CHLA_N_y_limits) +
   our_theme +
-  theme(legend.position = "none")      # legend on right for combined figure
+  theme(legend.position = "none")  
 
 NO3F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = NO3F, y = CHLA_N, color = StationName)) +
@@ -771,12 +765,10 @@ NO3F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   our_theme +
   theme(legend.position = "none")
 
-plot_grid(
-  NO3F_CHLA_N_combined,
+plot_grid(NO3F_CHLA_N_combined,
   NO3F_CHLA_N_faceted,
-  ncol = 2,          # side-by-side layout
-  rel_widths = c(1, 1)  # adjust width proportions if needed
-)
+  ncol = 2,         
+  rel_widths = c(1, 1))
 ```
 
 ```{r fig.cap="Relationship between Phosphate and Chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
@@ -794,7 +786,7 @@ PO4F_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
   scale_x_continuous(limits = PO4F_x_limits) +
   scale_y_continuous(limits = CHLA_N_y_limits) +
   our_theme +
-  theme(legend.position = "none")      # legend on right for combined figure
+  theme(legend.position = "none")   
 
 PO4F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = PO4F, y = CHLA_N, color = StationName)) +
@@ -813,8 +805,8 @@ PO4F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
 plot_grid(
   PO4F_CHLA_N_combined,
   PO4F_CHLA_N_faceted,
-  ncol = 2,          # side-by-side layout
-  rel_widths = c(1, 1)  # adjust width proportions if needed
+  ncol = 2,         
+  rel_widths = c(1, 1)  
 )
 ```
 
@@ -833,7 +825,7 @@ NH4F_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
   scale_x_continuous(limits = NH4F_x_limits) +
   scale_y_continuous(limits = CHLA_N_y_limits) +
   our_theme +
-  theme(legend.position = "none")      # legend on right for combined figure
+  theme(legend.position = "none")   
 
 NH4F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = NH4F, y = CHLA_N, color = StationName)) +
@@ -849,12 +841,10 @@ NH4F_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   our_theme +
   theme(legend.position = "none")
 
-plot_grid(
-  NH4F_CHLA_N_combined,
+plot_grid(NH4F_CHLA_N_combined,
   NH4F_CHLA_N_faceted,
-  ncol = 2,          # side-by-side layout
-  rel_widths = c(1, 1)  # adjust width proportions if needed
-)
+  ncol = 2,         
+  rel_widths = c(1, 1))
 ```
 
 ```{r fig.cap="Relationship between Depth and Chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
@@ -870,7 +860,7 @@ Depth_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
   ylab("Chlorophyll a (ug/L)") +
   scale_y_continuous(limits = CHLA_N_y_limits) +
   our_theme +
-  theme(legend.position = "none")      # legend on right for combined figure
+  theme(legend.position = "none")     
 
 Depth_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = Depth, y = CHLA_N, color = StationName)) +
@@ -885,12 +875,10 @@ Depth_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   our_theme +
   theme(legend.position = "none")
 
-plot_grid(
-  Depth_CHLA_N_combined,
+plot_grid(Depth_CHLA_N_combined,
   Depth_CHLA_N_faceted,
-  ncol = 2,          # side-by-side layout
-  rel_widths = c(1, 1)  # adjust width proportions if needed
-)
+  ncol = 2,         
+  rel_widths = c(1, 1))
 ```
 \clearpage
 ## 5.3 Chlorophyll and Dissolved Oxygen 
@@ -910,7 +898,7 @@ DO_CHLA_N_combined <- stations_wq_nutr_cleaned %>%
   ylab("Dissolved Oxygen (mg/L)") +
   scale_x_continuous(limits = CHLA_N_x_limits) +
   our_theme +
-  theme(legend.position = "none")      # legend on right for combined figure
+  theme(legend.position = "none")     
 
 DO_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   ggplot(aes(x = CHLA_N, y = DO_mgl, color = StationName)) +
@@ -925,12 +913,10 @@ DO_CHLA_N_faceted <- stations_wq_nutr_cleaned %>%
   our_theme +
   theme(legend.position = "none")
 
-plot_grid(
-  DO_CHLA_N_combined,
+plot_grid(DO_CHLA_N_combined,
   DO_CHLA_N_faceted,
-  ncol = 2,          # side-by-side layout
-  rel_widths = c(1, 1)  # adjust width proportions if needed
-)
+  ncol = 2,         
+  rel_widths = c(1, 1))
 ```
 \clearpage
 
@@ -2313,7 +2299,7 @@ Research Creek: Phosphate had an insignificant trend, ammonium had a significant
 
 Zeke's Basin: Phosphate had an insignificant trend, ammonium had a significant decreasing trend, nitrate had an insignificant trend, and temperature had a significant increasing trend.
 
-From these results, what is consistent across each monitoring station is that temperature has been increasing, which decreases the amount of oxygen available in liquid water while improving conditions for the proliferation of phytoplanktonic communities in the river basin. Additionally, ammonium has a significant decreasing trend across all stations, but this could be a result of phytoplankton uptaking ammonium rapidly (find citation). Similarly, in half of the monitoring stations phosphate is also significantly decreasing (also a potential consequence of phytoplankton uptake). Lastly, nitrate's lack of significant trends leads us to find its role in eutrophication for the river basin inconclusive. Our takeaways are that temperature is absolutely increasing and potentially affecting the dissolved oxygen and phytoplankton communities in the Cape Fear River basin, but the impacts on nutrients are inconclusive -- further research is needed to understand the mechanisms and temporal lag between nutrient concentrations like phosphate and ammonium and phytoplankton populations. Overall, it's difficult to assess conclusions based off of nutrients, as we have a chicken and the egg scenario with our data. However, it is clear that climate change and increasing temperatures are putting the Cape Fear River basin at risk for anoxic conditions as a consequence of warmer water and increasing phytoplanktonic activity, and should be heavily considered in the future coastal management of the region.
+From these results, what is consistent across each monitoring station is that temperature has been increasing, which decreases the amount of oxygen available in liquid water while improving conditions for the proliferation of phytoplanktonic communities in the river basin. Additionally, ammonium has a significant decreasing trend across all stations, but this could be a result of phytoplankton uptaking ammonium rapidly. Similarly, in half of the monitoring stations phosphate is also significantly decreasing (also a potential consequence of phytoplankton uptake). Lastly, nitrate's lack of significant trends leads us to find its role in eutrophication for the river basin inconclusive. Our takeaways are that temperature is absolutely increasing and potentially affecting the dissolved oxygen and phytoplankton communities in the Cape Fear River basin, but the impacts on nutrients are inconclusive -- further research is needed to understand the mechanisms and temporal lag between nutrient concentrations like phosphate and ammonium and phytoplankton populations. Temporal lag and hysteresis need to be more deeply looked into, as it's difficult to make assumptions about the relationship between phosphate and ammonium nutrient use efficiency in phytoplankton populations just from chlorophyll a concentration data. Overall, it's difficult to assess conclusions based off of nutrients, as we have a chicken and the egg scenario with our data. However, it is clear that climate change and increasing temperatures are putting the Cape Fear River basin at risk for anoxic conditions as a consequence of warmer water and increasing phytoplanktonic activity, and should be heavily considered in the future coastal management of the region.
 
 \clearpage
 
