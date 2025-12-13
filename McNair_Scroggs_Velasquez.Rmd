@@ -56,11 +56,11 @@ knitr::include_graphics(c("NOCEC.png",
   
   Our research questions are:
     
-   1. Has there been significant statistical trends in the dissolved oxygen and chlorophyll a concentrations at the water quality monitoring stations over time?
+1. Has there been significant statistical trends in the dissolved oxygen and chlorophyll a concentrations at the water quality monitoring stations over time?
     
-   2.0. Which water nutrient variables are most strongly predictive of dissolved oxygen and chlorophyll a?
+2a. Which water nutrient variables are most strongly predictive of dissolved oxygen and chlorophyll a?
 
-   2.1. Have these strongly predictive variables had significant statistical trends in their concentrations at the water quality monitoring stations over time?
+2b. Have these strongly predictive variables had significant statistical trends in their concentrations at the water quality monitoring stations over time?
   
 
 \clearpage
@@ -451,7 +451,7 @@ corrplot(cor_matrix, method = "color", type = "upper",
 Relationships between different nutrients is important to understand water quality and ecosystem health, so we will look at the different variables and see how they relate to each other based on our initial comparison. We're most interested in dissolved oxygen across the four monitoring stations. We will start with seeing how the other variables relate to dissolved oxygen. Is there consistent data for us to analyze? Could we identify trends over time?
 
 Although plotting dissolved oxygen is helpful for seeing consistent patterns and concentrations across all four stations, let's look at them separately to see gaps and data coverage.
-```{r fig.cap="Dissolved oxygen over time for each station", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Dissolved Oxygen Over Time for Each Station", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 #looking at dissolved oxygen over time for each station
 stations_wq_nutr_cleaned %>% 
   ggplot(aes(x = Date, y = DO_mgl, color = StationName)) +
@@ -462,7 +462,7 @@ stations_wq_nutr_cleaned %>%
   our_theme
 ```
 
-```{r fig.cap="Dissolved oxygen over time for each station separately", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Dissolved Oxygen Over Time for Each Station Separately", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 #Using facets to plot DO separately for each monitoring station
 stations_wq_nutr_cleaned %>%
   ggplot(mapping = aes(x=Date, y=DO_mgl)) +
@@ -478,7 +478,7 @@ stations_wq_nutr_cleaned %>%
 \clearpage
 
 It seems that there's variation in dissolved oxygen across the year. What do the monthly spreads look like?
-```{r fig.cap="Dissolved oxygen monthly averages at each monitoring station", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
+```{r fig.cap="Dissolved Oxygen Monthly Averages at Each Monitoring Station", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 #looking at monthly averages
 stations_wq_nutr_cleaned %>%
   ggplot(aes(x = factor(Month,levels=1:12,labels=month.abb), y = DO_mgl, color = StationName)) +
@@ -670,7 +670,7 @@ stations_wq_nutr_cleaned %>%
   our_theme
 ```
 
-```{r fig.cap="Chlorophyll concentrations from 2002-2024 for each monitoring station", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
+```{r fig.cap="Chlorophyll Concentrations from 2002-2024 for Each Monitoring Station", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', out.width='65%'}
 #Using facets to plot chlorophyll separately for each monitoring station
 stations_wq_nutr_cleaned %>%
   ggplot(mapping = aes(x=Date, y=CHLA_N)) +
@@ -884,7 +884,7 @@ plot_grid(Depth_CHLA_N_combined,
 ## 5.3 Chlorophyll and Dissolved Oxygen 
 
 Now to see if there is a relationship between the two variables we care the most about:
-```{r fig.cap="Relationship between dissolved oxygen and chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
+```{r fig.cap="Relationship between Dissolved Oxygen and Chlorophyll", echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 #Looking at dissolved oxygen vs chlorophyll with trend line
 CHLA_N_x_limits <- c(0,75)
 
@@ -921,7 +921,7 @@ plot_grid(DO_CHLA_N_combined,
 \clearpage
 
 # 6. Analysis
-To test our hypothesis, we want to do two main things: 1) Identify if there is a trend in decreasing dissolved oxygen and increasing chlorophyll across time, and 2) identify the variables most strongly correlated with possible changes.
+To answer our research questions, we want to do two main things: 1) Identify if there is a trend in decreasing dissolved oxygen and increasing chlorophyll across time, and 2) identify the variables most strongly correlated with possible changes.
 
 First, we must turn dissolved oxygen into a time series across each station.
 
@@ -1136,7 +1136,7 @@ ZekesBasinDO.monthly.nonseas.trend <- trend::mk.test(ZekesBasinDO.monthly.nonsea
 # Inspect results
 ZekesBasinDO.monthly.nonseas.trend
 ```
-### All Monitoring Stations have had statistically significant decreasing trends in their Dissolved Oxygen.
+***All Monitoring Stations have had statistically significant decreasing trends in their Dissolved Oxygen.***
 
 ## 6.2 Chlorophyll Time Series Trend Analysis
 
@@ -1345,9 +1345,9 @@ ZekeBasinCHLA.monthly.nonseas.trend <- trend::mk.test(ZekeBasinCHLA.monthly.nons
 # Inspect results
 ZekeBasinCHLA.monthly.nonseas.trend
 ```
-All stations have statistically significant increasing trends in their Chlorophyll levels as well. Since all of the stations have statistically significant trends in their DO and Chlorophyll levels, now we ask, which variables are most responsible for these changes?  
+All stations have statistically significant increasing trends in their Chlorophyll levels as well. Since all of the stations have statistically significant trends in their DO and Chlorophyll levels, now we ask, which variables are most responsible for these changes? To accomplish this, we will perform a step-wise mulitple regression. 
 
-## Multiple Regression
+## 6.3 Multiple Regression
 
 ```{r echo=FALSE, fig.align='center', warning=FALSE, out.width='65%'}
 #DO
@@ -1369,7 +1369,7 @@ CHLA.regression <- lm(data = stations_wq_nutr_cleaned, CHLA_N~ Temp + PO4F
                       + NH4F)
 summary(CHLA.regression)
 ```
-### From these multiple regressions we find that temperature, phosphorus, and nitrate are the best variables for predicting DO and temperature, phosphorus, and ammonium are the best variables for predicting Chlorophyll. Both of these relationships are significant, although the R-squared for the Chlorophyll regression is 0.1661 which indicates a weaker correlation. 
+From these multiple regressions we find that temperature, phosphorus, and nitrate are the best variables for predicting DO and temperature, phosphorus, and ammonium are the best variables for predicting Chlorophyll. Both of these relationships are significant, although the R-squared for the Chlorophyll regression is 0.1661 which indicates a weaker correlation. 
 
 Temperature is the most impactful variable in both of the models, with PO4 being the least impactful. 
 
@@ -1413,7 +1413,6 @@ EastCribbing.PO4.monthly.decomposed <- stl(EastCribbing.PO4.monthly.ts,
 #plotting
 plot(EastCribbing.PO4.monthly.decomposed)
 ```
-
 
 ```{r echo=FALSE, fig.cap="Non-Seasonal Trend of East Cribbing PO4", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
@@ -1612,7 +1611,7 @@ For East Cribbing, PO4 had a significant increasing trend, NH4 had a significant
 ### 6.4.2 Loosin Creek
 
 **PO4**
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+```{r echo=FALSE, fig.cap="Decomposed Components of Loosin Creek PO4 Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #PO4 - Loosin Creek
 LoosinCreek_PO4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Loosin Creek") %>% 
@@ -1645,6 +1644,9 @@ LoosinCreek.PO4.monthly.decomposed <- stl(LoosinCreek.PO4.monthly.ts,
 
 #plotting
 plot(LoosinCreek.PO4.monthly.decomposed)
+```
+
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Loosin Creek PO4", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 
 #Running monotonic trend analysis to inspect seasonality
 LoosinCreek.PO4.monthly.trend <- 
@@ -1658,14 +1660,13 @@ LoosinCreek.PO4.monthly.nonseas <- (LoosinCreek.PO4.monthly.ts -
 
 #making sure it worked
 plot(LoosinCreek.PO4.monthly.nonseas)
-plot(LoosinCreek.PO4.monthly.ts)
+#plot(LoosinCreek.PO4.monthly.ts)
 
 # Running Mann Kendall on non-seasonal monthly series
 LoosinCreek.PO4.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.PO4.monthly.nonseas)
 # Inspect results
 LoosinCreek.PO4.monthly.nonseas.trend
 ```
-Non seasonal trend is significantly decreasing. 
 
 **NH4**
 ```{r echo=FALSE, fig.cap="Decomposed Components of Loosin Creek NH4 Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
@@ -1723,7 +1724,6 @@ LoosinCreek.NH4.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.NH4.monthly.
 # Inspect results
 LoosinCreek.NH4.monthly.nonseas.trend
 ```
-Decreasing trend, significant. 
 
 **NO3**
 ```{r echo=FALSE, fig.cap="Decomposed Components of Loosin Creek NO3 Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
@@ -1781,7 +1781,6 @@ LoosinCreek.NO3.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.NO3.monthly.
 # Inspect results
 LoosinCreek.NO3.monthly.nonseas.trend
 ```
-Seasonal trend is significantly decreasing ? 
 
 **Temperature**
 ```{r echo=FALSE, fig.cap="Decomposed Components of Loosin Creek Temperature Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
@@ -1819,7 +1818,7 @@ LoosinCreek.Temp.monthly.decomposed <- stl(LoosinCreek.Temp.monthly.ts,
 plot(LoosinCreek.Temp.monthly.decomposed)
 ```
 
-```{r echo=FALSE, fig.cap="Figure 6.4.2.8: Non-Seasonal Trend of Loosin Creek NO3", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Loosin Creek Temperature", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 LoosinCreek.Temp.monthly.trend <- 
   Kendall::SeasonalMannKendall(LoosinCreek.Temp.monthly.ts)
@@ -1839,12 +1838,13 @@ LoosinCreek.Temp.monthly.nonseas.trend <- trend::mk.test(LoosinCreek.Temp.monthl
 # Inspect results
 LoosinCreek.Temp.monthly.nonseas.trend
 ```
-Significantly increasing. 
 
-For Loosin's Creek, NH4 showed a significant downward trend and temperature showed a significant upward trend.
+For Loosin Creek, PO4 and NH4 showed significant decreasing trends and temperature showed a significant increasing trend. NO3 did not have a significant trend. 
 
-Next, let's do **Research Creek**. 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+### 6.4.3 Research Creek
+
+**PO4**
+```{r echo=FALSE, fig.cap="Decomposed Components of Research Creek PO4 Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #PO4 - Research Creek
 ResearchCreek_PO4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Research Creek") %>% 
@@ -1877,7 +1877,9 @@ ResearchCreek.PO4.monthly.decomposed <- stl(ResearchCreek.PO4.monthly.ts,
 
 #plotting
 plot(ResearchCreek.PO4.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Research Creek PO4", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 ResearchCreek.PO4.monthly.trend <- 
   Kendall::SeasonalMannKendall(ResearchCreek.PO4.monthly.ts)
@@ -1897,8 +1899,9 @@ ResearchCreek.PO4.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.PO4.mont
 # Inspect results
 ResearchCreek.PO4.monthly.nonseas.trend
 ```
-Insignificant trend. 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+
+**NH4**
+```{r fig.cap="Decomposed Components of Research Creek NH4 Time Series", echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #NH4 - Research Creek
 ResearchCreek_NH4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Research Creek") %>% 
@@ -1931,7 +1934,9 @@ ResearchCreek.NH4.monthly.decomposed <- stl(ResearchCreek.NH4.monthly.ts,
 
 #plotting
 plot(ResearchCreek.NH4.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Research Creek NH4", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 ResearchCreek.NH4.monthly.trend <- 
   Kendall::SeasonalMannKendall(ResearchCreek.NH4.monthly.ts)
@@ -1951,8 +1956,9 @@ ResearchCreek.NH4.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.NH4.mont
 # Inspect results
 ResearchCreek.NH4.monthly.nonseas.trend
 ```
-Significant downward trend. 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+
+**NO3**
+```{r echo=FALSE, fig.cap="Decomposed Components of Research Creek NO3 Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #NO3 - Research Creek
 ResearchCreek_NO3_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Research Creek") %>% 
@@ -1985,7 +1991,9 @@ ResearchCreek.NO3.monthly.decomposed <- stl(ResearchCreek.NO3.monthly.ts,
 
 #plotting
 plot(ResearchCreek.NO3.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Research Creek NO3", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 ResearchCreek.NO3.monthly.trend <- 
   Kendall::SeasonalMannKendall(ResearchCreek.NO3.monthly.ts)
@@ -2005,8 +2013,9 @@ ResearchCreek.NO3.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.NO3.mont
 # Inspect results
 ResearchCreek.NO3.monthly.nonseas.trend
 ```
-Significant postive trend ? 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+
+**Temperature**
+```{r echo=FALSE, fig.cap="Decomposed Components of Research Creek Temperature Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Temp - Research Creek
 ResearchCreek_Temp_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Research Creek") %>% 
@@ -2039,7 +2048,9 @@ ResearchCreek.Temp.monthly.decomposed <- stl(ResearchCreek.Temp.monthly.ts,
 
 #plotting
 plot(ResearchCreek.Temp.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Research Creek Temperature", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 ResearchCreek.Temp.monthly.trend <- 
   Kendall::SeasonalMannKendall(ResearchCreek.Temp.monthly.ts)
@@ -2059,12 +2070,13 @@ ResearchCreek.Temp.monthly.nonseas.trend <- trend::mk.test(ResearchCreek.Temp.mo
 # Inspect results
 ResearchCreek.Temp.monthly.nonseas.trend
 ```
-Seems like there is an outlier in the temperature data (most likley some kind of error). 
 
-For Research Creek, NH4 had a significant downward trend and NO3 had a significant postive trend ? 
+For Research Creek, NH4 had a significant decreasing trend and NO3 and temperature had significant increasing trends (for temperature, this is still despite a significant outlier that can likely be attributed to human error in data collection). PO4 did not have a significant trend. 
 
-Lastly, we will do **Zeke's Basin**. 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+### 6.4.4 Zeke's Basin
+
+**PO4**
+```{r echo=FALSE, fig.cap="Decomposed Components of Zeke's Basin PO4 Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #PO4 - Zeke's Basin
 ZekeBasin_PO4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Zeke's Basin") %>% 
@@ -2097,7 +2109,9 @@ ZekeBasin.PO4.monthly.decomposed <- stl(ZekeBasin.PO4.monthly.ts,
 
 #plotting
 plot(ZekeBasin.PO4.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Zeke's Basin PO4", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 ZekeBasin.PO4.monthly.trend <- 
   Kendall::SeasonalMannKendall(ZekeBasin.PO4.monthly.ts)
@@ -2117,8 +2131,9 @@ ZekeBasin.PO4.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.PO4.monthly.nons
 # Inspect results
 ZekeBasin.PO4.monthly.nonseas.trend
 ```
-Insignificant trend. 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+
+**NH4**
+```{r echo=FALSE, fig.cap="Decomposed Components of Zeke's Basin NH4 Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #NH4 - Zeke's Basin
 ZekeBasin_NH4_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Zeke's Basin") %>% 
@@ -2151,7 +2166,9 @@ ZekeBasin.NH4.monthly.decomposed <- stl(ZekeBasin.NH4.monthly.ts,
 
 #plotting
 plot(ZekeBasin.NH4.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Zeke's Basin NH4", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 ZekeBasin.NH4.monthly.trend <- 
   Kendall::SeasonalMannKendall(ZekeBasin.NH4.monthly.ts)
@@ -2171,8 +2188,9 @@ ZekeBasin.NH4.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.NH4.monthly.nons
 # Inspect results
 ZekeBasin.NH4.monthly.nonseas.trend
 ```
-Significant downward trend. 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+
+**NO3**
+```{r echo=FALSE, fig.cap="Decomposed Components of Zeke's Basin NO3 Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #NO3 - Zeke's Basin
 ZekeBasin_NO3_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Zeke's Basin") %>% 
@@ -2205,7 +2223,9 @@ ZekeBasin.NO3.monthly.decomposed <- stl(ZekeBasin.NO3.monthly.ts,
 
 #plotting
 plot(ZekeBasin.NO3.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Zeke's Basin NO3", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 ZekeBasin.NO3.monthly.trend <- 
   Kendall::SeasonalMannKendall(ZekeBasin.NO3.monthly.ts)
@@ -2225,8 +2245,9 @@ ZekeBasin.NO3.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.NO3.monthly.nons
 # Inspect results
 ZekeBasin.NO3.monthly.nonseas.trend
 ```
-Insignificant trend. 
-```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
+
+**Temperature**
+```{r echo=FALSE, fig.cap="Decomposed Components of Zeke's Basin Temperature Time Series", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Temp - Zeke's Basin
 ZekeBasin_Temp_monthly <- stations_wq_nutr_cleaned %>%
   filter(StationName == "Zeke's Basin") %>% 
@@ -2259,7 +2280,9 @@ ZekeBasin.Temp.monthly.decomposed <- stl(ZekeBasin.Temp.monthly.ts,
 
 #plotting
 plot(ZekeBasin.Temp.monthly.decomposed)
+```
 
+```{r echo=FALSE, fig.cap="Non-Seasonal Trend of Zeke's Basin Temperature", fig.align='center', message=FALSE, warning=FALSE, out.width='65%'}
 #Running monotonic trend analysis to inspect seasonality
 ZekeBasin.Temp.monthly.trend <- 
   Kendall::SeasonalMannKendall(ZekeBasin.Temp.monthly.ts)
@@ -2279,15 +2302,14 @@ ZekeBasin.Temp.monthly.nonseas.trend <- trend::mk.test(ZekeBasin.Temp.monthly.no
 # Inspect results
 ZekeBasin.Temp.monthly.nonseas.trend
 ```
-Significant upward trend. 
 
-For **Zeke's Basin**, NH4 had a significant downward trend and temperature had a significant upward trend. 
+For Zeke's Basin, NH4 had a significant decreasing trend, temperature had a significant increasing trend, and PO4 and NO3 had insignificant trends. 
 
 \clearpage
 
 # 7. Summary and Conclusion
 
-After conducting time series trend analyses on the dissolved oxygen and chlorophyll concentrations across each research station, we found that dissolved oxygen has indeed decreased over time across all monitoring stations, and that Chlorophyll has indeed increased over time across all monitoring stations. This leads us to believe that phytoplankton populations have grown over time in the Cape Fear River basin, and could be contributing to decreasing dissolved oxygen available in the water. After this part of our analysis, we decided to run a step-wise multiple regression for dissolved oxygen and chlorophyll on the water nutrient variables and also temperature across all monitoring stations. We found that temperature, phosphate, and ammonium are the best variables for predicting chlorophyll. On the other hand, we found that temperature, phosphate, and nitrate are the best variables for predicting dissolved oxygen. 
+After conducting time series trend analyses on the dissolved oxygen and chlorophyll concentrations across each research station, we found that dissolved oxygen has indeed decreased over time across all monitoring stations, and that Chlorophyll has indeed increased over time across all monitoring stations. This leads us to believe that phytoplankton populations have grown over time in the Cape Fear River basin, and could be contributing to decreasing dissolved oxygen available in the water. After this part of our analysis, we decided to run a step-wise multiple regression for dissolved oxygen and chlorophyll on the water nutrient variables and temperature across all monitoring stations. We found that temperature, phosphate, and ammonium are the best variables for predicting chlorophyll. On the other hand, we found that temperature, phosphate, and nitrate are the best variables for predicting dissolved oxygen. 
 
 We decided to conduct time series analyses on the temperature, phosphate, nitrate, and ammonium as they best predicted dissolved oxygen and chlorophyll trends. We found the following results for each monitoring station:
 
