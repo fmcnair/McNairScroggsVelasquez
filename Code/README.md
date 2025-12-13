@@ -8,9 +8,7 @@ The goal of our analysis is to study the potential for eutrophication in the bas
 
 ## Investigators
 
-Flannery McNair 
-Andi Scroggs
-Alonso Velasquez 
+Flannery McNair, Andi Scroggs, and Alonso Velasquez 
 
 ## Keywords
 
@@ -24,10 +22,11 @@ The data used in this research was collected by the National Estuarine Research 
 
 The three folders in the repository include Code, Data, and Output. The code file includes our README.md document and our Rmd file including the code of our study. The data file includes files of our raw data and our processed data. The raw data file has all of the individual files we downloaded from the NERR Centralized Data Management Office, all of which are .csv files. The processed data is the data that we wrangled and used in our study. The output folder contains the pdf final product of our research.
 The names of our files are clear and say what they contain in their names. The Rmd file is the last names of the researchers in our group. The raw data is named after the station ID's given by NERR. The "-nut" stands for nutrient and the folders with this at the end of the station ID's contain the nutrient data. The "-wq" stands for water quality. The folders with this at the end of the station ID's contain the water quality data from that station.
-NOCEC - East Cribbing
-NOCLC - Loosin Creek
-NOCRC - Research Creek
-NOCZB - Zeke's Basin
+
+- NOCEC - East Cribbing
+- NOCLC - Loosin Creek
+- NOCRC - Research Creek
+- NOCZB - Zeke's Basin
 
 ## Metadata
 
