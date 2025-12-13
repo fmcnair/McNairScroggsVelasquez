@@ -38,20 +38,21 @@ Water quality data files contain these columns of data:
 - a parameter value column; consult the metadata for the list of station and parameter codes
 - a parameter flag column (the parameter header is preceded by a F_); refer to the QA Flags section below for the flag codes and descriptions
 - a parameter error code column (the parameter header is preceded by EC_) MAY be present in the file depending on export type; refer to the QA Flags section below.
+  
 Water quality parameters:
-Temp: water temperature measured in degrees Celsius (C)
-SpCond: specific conductivity measured in milli-Siemens per centimeter (mS/cm)
-Sal: salinity measured in parts per thousand (ppt)
-DO_pct: dissolved oxygen measured in percent saturation (%)
-DO_mgl: dissolved oxygen concentration measured in milligrams per Liter (mg/L)
-Depth: sonde depth measured in meters (m)
-cDepth: depth from a non-vented sensor corrected for changes in barometric pressure (m)
-Level: sonde depth as referenced to a known vertical datum, NAVD88, measured in meters (m). 
-cLevel: level from a non-vented sensor corrected for changes in barometric pressure (m).
-pH: pH measured in standard units
-Turb: turbidity measured in nephelometric turbidity units (NTU)
-ChlFluor: chlorophyll fluorescence measured in micrograms per Liter (ug/L)*
-*ChlFluor is an optional SWMP supported parameter
+- Temp: water temperature measured in degrees Celsius (C)
+- SpCond: specific conductivity measured in milli-Siemens per centimeter (mS/cm)
+- Sal: salinity measured in parts per thousand (ppt)
+- DO_pct: dissolved oxygen measured in percent saturation (%)
+- DO_mgl: dissolved oxygen concentration measured in milligrams per Liter (mg/L)
+- Depth: sonde depth measured in meters (m)
+- cDepth: depth from a non-vented sensor corrected for changes in barometric pressure (m)
+- Level: sonde depth as referenced to a known vertical datum, NAVD88, measured in meters (m). 
+- cLevel: level from a non-vented sensor corrected for changes in barometric pressure (m).
+- pH: pH measured in standard units
+- Turb: turbidity measured in nephelometric turbidity units (NTU)
+- ChlFluor: chlorophyll fluorescence measured in micrograms per Liter (ug/L)*
+*ChlFluor is an optional SWMP supported parameter*
 
 Nutrient data file contains the following columns of data: 
 - a date/time stamp column (local standard time)
@@ -62,15 +63,16 @@ Nutrient data file contains the following columns of data:
 - a parameter flag column (the parameter header is preceded by a F_); refer to the QA Flags section below for the flag codes and descriptions 
 - a parameter error code column (the parameter header is preceded by EC_) MAY be present in the file depending on export type; refer to the QA Flags section below.
 - a comment code column in (yearly files prior to 2007 only; the parameter header is followed by a _C); refer to the QA Flags section below for the flag codes and descriptions
-Nutrient parameters:
-PO4F: orthophosphate measured in milligrams per Liter (mg/L)
-NH4F: ammonium measured in milligrams per Liter (mg/L)
-NO2F: nitrite measured in milligrams per Liter (mg/L)
-NO3F: nitrate measured in milligrams per Liter (mg/L)
-NO23F: nitrite + nitrate measured in milligrams per Liter (mg/L)
-CHLA_N: chlorophyll a measured in micrograms per Liter (ug/L)
 
-QA/QC
+Nutrient parameters:
+- PO4F: orthophosphate measured in milligrams per Liter (mg/L)
+- NH4F: ammonium measured in milligrams per Liter (mg/L)
+- NO2F: nitrite measured in milligrams per Liter (mg/L)
+- NO3F: nitrate measured in milligrams per Liter (mg/L)
+- NO23F: nitrite + nitrate measured in milligrams per Liter (mg/L)
+- CHLA_N: chlorophyll a measured in micrograms per Liter (ug/L)
+
+QA/QC:
 All NERR SWMP data incur primary data QAQC at the CDMO within one week of data retrieval as the provisional data are ingested into the CDMO database. The data are then emailed back to the Reserve where Reserve staff use tools provided by the CDMO, Microsoft Excel macros, to perform secondary QAQC on the data. Data that have been through secondary QAQC are submitted back to the CDMO quarterly and again annually; these data are posted as provisional plus.  After annual submission to the CDMO is complete, the data undergo final tertiary QAQC by the CDMO.  The data and its accompanying metadata documentation are checked for completeness before dissemination as authenticated historical data via the CDMO Online Data Information Server (http://cdmo.baruch.sc.edu).
 
 Processed Data
